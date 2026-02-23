@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "@/hooks/use-navigate";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -25,6 +26,7 @@ import {
   defaultNotificationSettings,
   type NotificationSettings,
 } from "@/data/notifications";
+import { cn } from "@/lib/utils";
 
 interface SettingItemProps {
   icon: React.ReactNode;
@@ -32,6 +34,7 @@ interface SettingItemProps {
   description: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  highlighted?: boolean;
 }
 
 function SettingItem({
@@ -40,11 +43,20 @@ function SettingItem({
   description,
   checked,
   onCheckedChange,
+  highlighted,
 }: SettingItemProps) {
   return (
-    <div className="flex items-start justify-between gap-4 py-4">
+    <div
+      className={cn(
+        "flex items-start justify-between gap-4 py-4 transition-all duration-500 rounded-lg px-3 -mx-3",
+        highlighted && "animate-highlight-pulse"
+      )}
+    >
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground">
+        <div className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+          highlighted ? "bg-[#126BFF] text-white" : "bg-muted text-muted-foreground"
+        )}>
           {icon}
         </div>
         <div className="flex-1">
@@ -59,9 +71,26 @@ function SettingItem({
 
 export default function NotificationSettings() {
   const navigate = useNavigate();
+  const searchParams = useSearchParams();
+  const marketingRef = useRef<HTMLDivElement>(null);
+  const [highlightMarketing, setHighlightMarketing] = useState(false);
   const [settings, setSettings] = useState<NotificationSettings>(
     defaultNotificationSettings
   );
+
+  useEffect(() => {
+    const highlight = searchParams?.get("highlight");
+    if (highlight === "marketing") {
+      setTimeout(() => {
+        marketingRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        setHighlightMarketing(true);
+        setTimeout(() => setHighlightMarketing(false), 3000);
+      }, 300);
+    }
+  }, [searchParams]);
 
   const updateSetting = <K extends keyof NotificationSettings>(
     key: K,
@@ -72,6 +101,25 @@ export default function NotificationSettings() {
 
   return (
     <div className="min-h-screen bg-background">
+      <style jsx global>{`
+        @keyframes highlight-pulse {
+          0%, 100% {
+            background: transparent;
+          }
+          25% {
+            background: linear-gradient(135deg, rgba(18, 107, 255, 0.15) 0%, rgba(18, 107, 255, 0.05) 100%);
+          }
+          50% {
+            background: linear-gradient(135deg, rgba(18, 107, 255, 0.25) 0%, rgba(18, 107, 255, 0.1) 100%);
+          }
+          75% {
+            background: linear-gradient(135deg, rgba(18, 107, 255, 0.15) 0%, rgba(18, 107, 255, 0.05) 100%);
+          }
+        }
+        .animate-highlight-pulse {
+          animation: highlight-pulse 2s ease-in-out 2;
+        }
+      `}</style>
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
         <div className="container mx-auto px-4 py-3 flex items-center gap-4">
           <Button
@@ -143,13 +191,14 @@ export default function NotificationSettings() {
                 onCheckedChange={(v) => updateSetting("pushNews", v)}
               />
             </div>
-            <div className="px-6">
+            <div className="px-6" ref={marketingRef} id="marketing-setting">
               <SettingItem
                 icon={<Megaphone className="w-5 h-5" />}
                 title="마케팅 알림"
                 description="이벤트, 프로모션 정보를 받아보세요"
                 checked={settings.pushMarketing}
                 onCheckedChange={(v) => updateSetting("pushMarketing", v)}
+                highlighted={highlightMarketing}
               />
             </div>
           </CardContent>

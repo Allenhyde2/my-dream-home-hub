@@ -273,7 +273,10 @@ const Index = () => {
             </AlertDialogCancel>
             <AlertDialogAction
               className="flex-1 rounded-xl h-12 bg-[#126BFF] hover:bg-[#126BFF]/90"
-              onClick={() => setShowNotificationPopup(false)}
+              onClick={() => {
+                setShowNotificationPopup(false);
+                navigate("/settings/notifications?highlight=marketing");
+              }}
             >
               확인
             </AlertDialogAction>
