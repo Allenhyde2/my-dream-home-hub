@@ -246,17 +246,17 @@ const Index = () => {
             <div className="w-16 h-16 rounded-full bg-[#126BFF]/10 flex items-center justify-center mb-5">
               <BellRing className="w-8 h-8 text-[#126BFF]" />
             </div>
-            <p className="text-[15px] leading-relaxed text-foreground mb-1">
-              놓치면 안될 <span className="font-bold text-[#126BFF]">줍줍·청약 정보</span>와
+            <p className="text-lg font-bold text-foreground mb-5">
+              알림 기능을 켜주세요
             </p>
             <p className="text-[15px] leading-relaxed text-foreground mb-1">
-              관심지역 <span className="font-bold text-[#126BFF]">핵심 소식</span>을
+              일에 육아에 우리 너무 바쁘잖아요
+            </p>
+            <p className="text-[15px] leading-relaxed text-foreground mb-1">
+              <span className="font-bold text-[#126BFF]">청약 일정</span>, <span className="font-bold text-[#126BFF]">주요 뉴스</span>, <span className="font-bold text-[#126BFF]">내집마련 정보</span>까지
             </p>
             <p className="text-[15px] leading-relaxed text-foreground mb-6">
-              뉴글이 알아서 보내드릴게요
-            </p>
-            <p className="text-sm font-semibold text-foreground mb-5">
-              뉴글 알림 받기
+              뉴글이 알아서 알려드릴게요.
             </p>
           </div>
           <AlertDialogFooter className="flex-row gap-2 sm:gap-2">

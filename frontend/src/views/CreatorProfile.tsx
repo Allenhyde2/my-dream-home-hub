@@ -433,11 +433,32 @@ const CreatorProfile = () => {
               </DialogHeader>
               <div className="py-6 text-center">
                 <h3 className="text-lg font-semibold mb-4">상담 예약이 완료되었습니다!</h3>
-                <div className="bg-muted rounded-lg p-4 space-y-2 text-left">
-                  <p><span className="text-muted-foreground">상담 유형:</span> {selectedProduct?.title}</p>
-                  <p><span className="text-muted-foreground">날짜:</span> {selectedDate && format(selectedDate, "yyyy년 M월 d일 (EEEE)", { locale: ko })}</p>
-                  <p><span className="text-muted-foreground">시간:</span> {selectedTime} ~ {selectedTime && selectedProduct && minutesToTime(timeToMinutes(selectedTime) + selectedProduct.durationMinutes)}</p>
-                  <p><span className="text-muted-foreground">금액:</span> {selectedProduct?.price.toLocaleString()}원</p>
+                <div className="rounded-xl border border-primary/20 bg-primary/5 overflow-hidden mt-2">
+                  <div className="px-4 py-3 bg-primary/10 border-b border-primary/15">
+                    <p className="text-xs font-semibold text-primary">예약 상세 내역</p>
+                  </div>
+                  <div className="divide-y divide-border/50">
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-xs text-muted-foreground w-20 shrink-0">상담 유형</span>
+                      <span className="text-sm font-medium text-foreground">{selectedProduct?.title}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-xs text-muted-foreground w-20 shrink-0">날짜</span>
+                      <span className="text-sm font-medium text-foreground text-right">
+                        {selectedDate && format(selectedDate, "yyyy년 M월 d일 (EEEE)", { locale: ko })}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-xs text-muted-foreground w-20 shrink-0">시간</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {selectedTime} ~ {selectedTime && selectedProduct && minutesToTime(timeToMinutes(selectedTime) + selectedProduct.durationMinutes)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-2.5">
+                      <span className="text-xs text-muted-foreground w-20 shrink-0">결제 금액</span>
+                      <span className="text-base font-bold text-primary">{selectedProduct?.price.toLocaleString()}원</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -524,12 +545,29 @@ const CreatorProfile = () => {
                 )}
 
                 {selectedDate && selectedTime && selectedProduct && (
-                  <div className="bg-muted rounded-lg p-4">
-                    <h4 className="font-medium mb-2">예약 정보</h4>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="text-muted-foreground">날짜:</span> {format(selectedDate, "yyyy년 M월 d일 (EEEE)", { locale: ko })}</p>
-                      <p><span className="text-muted-foreground">시간:</span> {selectedTime} ~ {minutesToTime(timeToMinutes(selectedTime) + selectedProduct.durationMinutes)}</p>
-                      <p><span className="text-muted-foreground">금액:</span> <span className="font-semibold text-primary">{selectedProduct.price.toLocaleString()}원</span></p>
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
+                    <div className="px-4 py-3 bg-primary/10 border-b border-primary/15">
+                      <h4 className="font-semibold text-sm text-primary">예약 정보 확인</h4>
+                    </div>
+                    <div className="divide-y divide-border/50">
+                      <div className="flex items-center justify-between px-4 py-2.5">
+                        <span className="text-xs text-muted-foreground w-14 shrink-0">날짜</span>
+                        <span className="text-sm font-medium text-foreground text-right">
+                          {format(selectedDate, "yyyy년 M월 d일 (EEEE)", { locale: ko })}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-2.5">
+                        <span className="text-xs text-muted-foreground w-14 shrink-0">시간</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {selectedTime} ~ {minutesToTime(timeToMinutes(selectedTime) + selectedProduct.durationMinutes)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-2.5">
+                        <span className="text-xs text-muted-foreground w-14 shrink-0">결제 금액</span>
+                        <span className="text-base font-bold text-primary">
+                          {selectedProduct.price.toLocaleString()}원
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
