@@ -1221,10 +1221,31 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
                     step={1}
                     className="w-full"
                   />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>1억 미만</span>
-                    <span>5억</span>
-                    <span>10억 이상</span>
+                  <div className="relative w-full h-6 pt-1 text-xs text-muted-foreground select-none">
+                    <button
+                      className="absolute left-0 cursor-pointer hover:text-primary transition-colors"
+                      onClick={() => setData({ ...data, availableFunds: "1억 미만" })}
+                    >
+                      1억 미만
+                    </button>
+                    <button
+                      className="absolute left-[31.03%] -translate-x-1/2 cursor-pointer hover:text-primary transition-colors"
+                      onClick={() => setData({ ...data, availableFunds: "5억" })}
+                    >
+                      5억
+                    </button>
+                    <button
+                      className="absolute left-[65.52%] -translate-x-1/2 cursor-pointer hover:text-primary transition-colors"
+                      onClick={() => setData({ ...data, availableFunds: "10억" })}
+                    >
+                      10억
+                    </button>
+                    <button
+                      className="absolute right-0 cursor-pointer hover:text-primary transition-colors"
+                      onClick={() => setData({ ...data, availableFunds: "15억 이상" })}
+                    >
+                      15억 이상
+                    </button>
                   </div>
                 </div>
               </div>
