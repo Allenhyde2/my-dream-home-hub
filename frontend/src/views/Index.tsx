@@ -9,6 +9,14 @@ import TrendingContent from "@/components/TrendingContent";
 import NationwideContent from "@/components/NationwideContent";
 import CreatorsList from "@/components/CreatorsList";
 import CoursesSection from "@/components/CoursesSection";
+import NotificationModal from "@/components/NotificationModal";
+
+
+
+
+
+
+
 import { Home, Bell, User, Search, LogOut, LogIn, BookOpen, Calendar, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -119,9 +127,9 @@ const Index = () => {
                 </DialogContent>
               </Dialog>
 
-              <Button variant="ghost" size="icon" className="text-foreground" data-testid="button-notifications">
-                <Bell className="w-5 h-5" />
-              </Button>
+              <NotificationModal />
+
+
 
               {isLoading ? (
                 <Skeleton className="w-9 h-9 rounded-full" />
