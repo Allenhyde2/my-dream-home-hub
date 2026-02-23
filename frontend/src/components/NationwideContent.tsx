@@ -93,8 +93,8 @@ const NationwideContent = () => {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {regionData.map((region) => (
-          <Card 
-            key={region.id} 
+          <Card
+            key={region.id}
             className="bg-card border-border hover-elevate cursor-pointer group"
             data-testid={`region-card-${region.id}`}
             onClick={() => setSelectedRegion(selectedRegion === region.id ? null : region.id)}
@@ -105,20 +105,19 @@ const NationwideContent = () => {
                   <MapPin className="w-4 h-4 text-primary" />
                   {region.name}
                 </CardTitle>
-                <ChevronRight 
-                  className={`w-5 h-5 text-muted-foreground transition-transform ${
-                    selectedRegion === region.id ? "rotate-90" : ""
-                  }`} 
+                <ChevronRight
+                  className={`w-5 h-5 text-muted-foreground transition-transform ${selectedRegion === region.id ? "rotate-90" : ""
+                    }`}
                 />
               </div>
               <div className="flex flex-wrap gap-1 mt-2">
                 {region.subRegions.slice(0, 3).map((sub) => (
-                  <Badge key={sub} variant="outline" className="text-xs">
+                  <Badge key={sub} variant="secondary" className="text-xs">
                     {sub}
                   </Badge>
                 ))}
                 {region.subRegions.length > 3 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="secondary" className="text-xs">
                     +{region.subRegions.length - 3}
                   </Badge>
                 )}
@@ -127,9 +126,9 @@ const NationwideContent = () => {
             <CardContent className="pt-0">
               <div className="space-y-2">
                 {region.topPosts.map((post, index) => (
-                  <div 
-                    key={post.id} 
-                    className="flex items-start gap-2 p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors"
+                  <div
+                    key={post.id}
+                    className="flex items-start gap-2 p-2 rounded-md bg-accent/40 hover:bg-accent/70 border border-border/20 transition-colors"
                   >
                     <span className="text-xs font-bold text-primary shrink-0 mt-0.5">
                       {index + 1}
@@ -150,8 +149,8 @@ const NationwideContent = () => {
                   </div>
                 ))}
               </div>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="w-full mt-3 text-primary"
                 data-testid={`button-more-${region.id}`}
               >

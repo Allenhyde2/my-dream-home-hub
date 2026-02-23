@@ -50,7 +50,7 @@ const generateMockPosts = (area: TargetArea): Post[] => {
 const RegionalDashboard = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const targetAreas = user?.targetAreas as TargetArea[] | undefined;
-  
+
   const [activeTab, setActiveTab] = useState<string>("0");
 
   const postsData = useMemo(() => {
@@ -83,7 +83,7 @@ const RegionalDashboard = () => {
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
-              {!isAuthenticated 
+              {!isAuthenticated
                 ? "로그인 후 관심 지역을 설정하면 맞춤 게시글을 볼 수 있습니다."
                 : "관심 지역을 설정하면 해당 지역의 최신 게시글을 확인할 수 있습니다."}
             </p>
@@ -119,7 +119,7 @@ const RegionalDashboard = () => {
 
         {sortedAreas.map((area, index) => (
           <TabsContent key={index} value={index.toString()}>
-            <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+            <div className="mb-4 p-3 bg-primary/5 rounded-lg border-l-2 border-primary/30">
               <p className="text-sm text-muted-foreground">
                 <MapPin className="w-4 h-4 inline mr-1" />
                 {area.city} {area.district} {area.dong}
@@ -127,8 +127,8 @@ const RegionalDashboard = () => {
             </div>
             <div className="space-y-3">
               {postsData[index.toString()]?.map((post) => (
-                <Card 
-                  key={post.id} 
+                <Card
+                  key={post.id}
                   className="hover-elevate cursor-pointer bg-card border-border"
                   data-testid={`post-card-${index}-${post.id}`}
                 >

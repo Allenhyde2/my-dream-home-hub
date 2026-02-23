@@ -244,7 +244,7 @@ const PersonalizedContent = () => {
                     {section.items.map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-lg bg-muted/50 hover-elevate cursor-pointer group"
+                        className="p-3 rounded-lg bg-accent/40 hover-elevate cursor-pointer group border border-border/30 hover:border-primary/20 transition-colors"
                         data-testid={`content-item-${item.id}`}
                       >
                         <h4 className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-primary transition-colors">
