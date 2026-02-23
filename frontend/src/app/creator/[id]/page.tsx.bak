@@ -1,0 +1,9 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const CreatorProfilePage = dynamic(() => import('@/pages/CreatorProfile'), { ssr: false });
+
+export default function Page() {
+  return <CreatorProfilePage />;
+}

@@ -1,0 +1,11 @@
+"use client"
+'use client';
+
+import nextDynamic from 'next/dynamic';
+
+const HomePage = nextDynamic(() => import('@/pages/Index'), { ssr: false });
+
+export const dynamic = 'force-dynamic';
+export default function Page() {
+  return <HomePage />;
+}

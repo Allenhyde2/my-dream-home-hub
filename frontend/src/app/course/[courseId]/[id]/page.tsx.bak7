@@ -1,0 +1,11 @@
+"use client"
+'use client';
+
+import nextDynamic from 'next/dynamic';
+
+const CourseDetailPage = nextDynamic(() => import('@/pages/CourseDetail'), { ssr: false });
+
+export const dynamic = 'force-dynamic';
+export default function Page() {
+  return <CourseDetailPage />;
+}

@@ -1,0 +1,552 @@
+import { useState } from "react";
+import { useNavigate } from "@/hooks/use-navigate";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { 
+  ArrowLeft, 
+  BookOpen, 
+  Play, 
+  Clock,
+  Settings,
+  ChevronRight,
+  Calendar,
+  Video,
+  RotateCcw,
+  X,
+  Receipt,
+  CheckCircle,
+  FileText,
+  ShoppingBag,
+  Award
+} from "lucide-react";
+import { getCourseById, LEVEL_DESCRIPTIONS } from "@/data/courses";
+import { creators } from "@/data/creators";
+import { useAuth } from "@/hooks/use-auth";
+
+interface EnrolledCourse {
+  courseId: number;
+  enrolledAt: string;
+  lastWatchedLessonId: number;
+  completedLessons: number[];
+  progress: number;
+  price: number;
+}
+
+interface ConsultationBooking {
+  id: number;
+  creatorId: number;
+  productName: string;
+  date: string;
+  time: string;
+  price: number;
+  status: "upcoming" | "completed" | "cancelled";
+}
+
+interface PurchasedContent {
+  id: number;
+  creatorId: number;
+  title: string;
+  price: number;
+  purchasedAt: string;
+  thumbnail?: string;
+}
+
+interface PurchaseItem {
+  id: number;
+  type: "course" | "consultation" | "content";
+  itemName: string;
+  price: number;
+  purchasedAt: string;
+  status: "completed" | "refunded" | "cancelled";
+}
+
+const mockEnrolledCourses: EnrolledCourse[] = [
+  { courseId: 1, enrolledAt: "2026-01-15", lastWatchedLessonId: 5, completedLessons: [1, 2, 3, 4], progress: 33, price: 49000 },
+  { courseId: 6, enrolledAt: "2026-01-20", lastWatchedLessonId: 3, completedLessons: [1, 2], progress: 13, price: 89000 },
+  { courseId: 2, enrolledAt: "2026-01-25", lastWatchedLessonId: 1, completedLessons: [], progress: 0, price: 39000 },
+];
+
+const mockConsultations: ConsultationBooking[] = [
+  { id: 1, creatorId: 1, productName: "30분 기본 상담", date: "2026-02-05", time: "14:00", price: 50000, status: "upcoming" },
+  { id: 2, creatorId: 2, productName: "1시간 심층 상담", date: "2026-02-10", time: "10:00", price: 100000, status: "upcoming" },
+  { id: 3, creatorId: 1, productName: "30분 기본 상담", date: "2026-01-20", time: "15:00", price: 50000, status: "completed" },
+];
+
+const mockPurchasedContents: PurchasedContent[] = [
+  { id: 1, creatorId: 1, title: "2026년 서울 재건축 유망 단지 TOP 10 분석", price: 15000, purchasedAt: "2026-01-18" },
+  { id: 2, creatorId: 2, title: "청약 당첨 확률 높이는 5가지 전략", price: 12000, purchasedAt: "2026-01-22" },
+  { id: 3, creatorId: 3, title: "GTX 호재 지역 투자 가이드", price: 20000, purchasedAt: "2026-01-25" },
+];
+
+const mockPurchaseHistory: PurchaseItem[] = [
+  { id: 1, type: "course", itemName: "부동산 투자 첫걸음: 완전 초보자를 위한 입문 강의", price: 49000, purchasedAt: "2026-01-15 10:30", status: "completed" },
+  { id: 2, type: "content", itemName: "2026년 서울 재건축 유망 단지 TOP 10 분석", price: 15000, purchasedAt: "2026-01-18 14:20", status: "completed" },
+  { id: 3, type: "course", itemName: "재건축 투자 전략: 사업성 분석부터 출구까지", price: 89000, purchasedAt: "2026-01-20 14:20", status: "completed" },
+  { id: 4, type: "consultation", itemName: "김재건 - 30분 기본 상담", price: 50000, purchasedAt: "2026-01-22 09:15", status: "completed" },
+  { id: 5, type: "content", itemName: "청약 당첨 확률 높이는 5가지 전략", price: 12000, purchasedAt: "2026-01-22 16:00", status: "completed" },
+  { id: 6, type: "course", itemName: "청약의 모든 것: A부터 Z까지", price: 39000, purchasedAt: "2026-01-25 16:45", status: "completed" },
+  { id: 7, type: "content", itemName: "GTX 호재 지역 투자 가이드", price: 20000, purchasedAt: "2026-01-25 18:30", status: "completed" },
+];
+
+const Profile = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [refundCourseId, setRefundCourseId] = useState<number | null>(null);
+  const [refundComplete, setRefundComplete] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
+  const [enrolledCourses, setEnrolledCourses] = useState(mockEnrolledCourses);
+  const [consultations, setConsultations] = useState(mockConsultations);
+
+  const coursesWithDetails = enrolledCourses.map((enrolled) => ({
+    ...enrolled,
+    course: getCourseById(enrolled.courseId),
+  })).filter((item) => item.course);
+
+  const notStartedCourses = coursesWithDetails.filter((item) => item.progress === 0);
+  const upcomingConsultations = consultations.filter((c) => c.status === "upcoming");
+
+  const handleRefundClick = (courseId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRefundCourseId(courseId);
+    setRefundDialogOpen(true);
+    setRefundComplete(false);
+  };
+
+  const handleRefundConfirm = () => {
+    if (refundCourseId) {
+      setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== refundCourseId));
+      setRefundComplete(true);
+    }
+  };
+
+  const handleCancelClick = (bookingId: number) => {
+    setCancelBookingId(bookingId);
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelConfirm = () => {
+    if (cancelBookingId) {
+      setConsultations((prev) => 
+        prev.map((c) => 
+          c.id === cancelBookingId ? { ...c, status: "cancelled" as const } : c
+        )
+      );
+      setCancelDialogOpen(false);
+    }
+  };
+
+  const getCreatorById = (creatorId: number) => {
+    return creators.find((c) => c.id === creatorId);
+  };
+
+  const refundCourse = refundCourseId ? coursesWithDetails.find((c) => c.courseId === refundCourseId) : null;
+  const cancelBooking = cancelBookingId ? consultations.find((c) => c.id === cancelBookingId) : null;
+
+  const recentItems = [...notStartedCourses.map(c => ({ type: 'course' as const, data: c })), 
+                       ...upcomingConsultations.map(c => ({ type: 'consultation' as const, data: c }))];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate("/")}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="font-semibold">내 프로필</h1>
+          </div>
+          <Button variant="ghost" size="icon" data-testid="button-settings">
+            <Settings className="h-5 w-5" />
+          </Button>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-6 max-w-4xl space-y-6">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-20 h-20">
+                <AvatarImage src={user?.profileImageUrl || ""} alt={user?.nickname || "User"} />
+                <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+                  {user?.nickname?.slice(0, 2) || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h2 className="text-xl font-bold" data-testid="text-user-nickname">
+                  {user?.nickname || "사용자"}
+                </h2>
+                <p className="text-muted-foreground text-sm">
+                  {user?.email || "user@example.com"}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 mt-2 text-sm">
+                  <button 
+                    onClick={() => navigate("/my-courses")}
+                    className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                    data-testid="stat-courses"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    <span>수강 중 {coursesWithDetails.length}개</span>
+                  </button>
+                  <button 
+                    onClick={() => navigate("/my-reservations")}
+                    className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                    data-testid="stat-reservations"
+                  >
+                    <Video className="w-4 h-4" />
+                    <span>예약 상담 {upcomingConsultations.length}개</span>
+                  </button>
+                  <button 
+                    onClick={() => navigate("/my-certificates")}
+                    className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                    data-testid="stat-certificates"
+                  >
+                    <Award className="w-4 h-4" />
+                    <span>수료증 2개</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Clock className="w-5 h-5 text-primary" />
+              최근 결제 내역
+            </h3>
+          </div>
+          
+          {recentItems.length > 0 ? (
+            <div className="space-y-3">
+              {notStartedCourses.map((item) => {
+                const course = item.course!;
+                const levelInfo = LEVEL_DESCRIPTIONS[course.level];
+                
+                return (
+                  <Card key={`course-${item.courseId}`} data-testid={`recent-course-${item.courseId}`}>
+                    <CardContent className="py-4">
+                      <div className="flex gap-4 items-center">
+                        <div className={`w-14 h-14 rounded-lg ${levelInfo.color} flex items-center justify-center shrink-0`}>
+                          <BookOpen className="w-6 h-6 text-white/80" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs">강의</Badge>
+                            <Badge variant="secondary" className="text-xs">시작 전</Badge>
+                          </div>
+                          <h4 className="font-medium line-clamp-1">{course.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {item.price.toLocaleString()}원 · {item.enrolledAt}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-1 text-destructive hover:text-destructive"
+                            onClick={(e) => handleRefundClick(item.courseId, e)}
+                            data-testid={`refund-course-${item.courseId}`}
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                            환불
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            className="gap-1"
+                            onClick={() => navigate(`/course/${item.courseId}/lecture/1`)}
+                          >
+                            <Play className="w-4 h-4" />
+                            시작
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+
+              {upcomingConsultations.map((booking) => {
+                const creator = getCreatorById(booking.creatorId);
+                
+                return (
+                  <Card key={`consultation-${booking.id}`} data-testid={`recent-consultation-${booking.id}`}>
+                    <CardContent className="py-4">
+                      <div className="flex gap-4 items-center">
+                        <Avatar className="w-14 h-14">
+                          <AvatarImage src={creator?.avatar} alt={creator?.name} />
+                          <AvatarFallback>{creator?.name.slice(0, 2)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs">상담</Badge>
+                            <Badge className="text-xs bg-blue-500">예약됨</Badge>
+                          </div>
+                          <h4 className="font-medium">{creator?.name} - {booking.productName}</h4>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {booking.date} {booking.time}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="gap-1 text-destructive hover:text-destructive"
+                            onClick={() => handleCancelClick(booking.id)}
+                            data-testid={`cancel-consultation-${booking.id}`}
+                          >
+                            <X className="w-4 h-4" />
+                            취소
+                          </Button>
+                          <Button size="sm" className="gap-1" data-testid={`join-consultation-${booking.id}`}>
+                            <Video className="w-4 h-4" />
+                            입장
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <Clock className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">최근 결제 내역이 없습니다</p>
+              </CardContent>
+            </Card>
+          )}
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <FileText className="w-5 h-5 text-orange-500" />
+              구매한 유료 컨텐츠
+            </h3>
+          </div>
+          
+          {mockPurchasedContents.length > 0 ? (
+            <div className="space-y-3">
+              {mockPurchasedContents.map((content) => {
+                const creator = getCreatorById(content.creatorId);
+                
+                return (
+                  <Card 
+                    key={content.id} 
+                    className="hover-elevate cursor-pointer"
+                    onClick={() => navigate(`/creator/${content.creatorId}`)}
+                    data-testid={`content-${content.id}`}
+                  >
+                    <CardContent className="py-4">
+                      <div className="flex gap-4 items-center">
+                        <div className="w-14 h-14 rounded-lg bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center shrink-0">
+                          <FileText className="w-6 h-6 text-orange-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="outline" className="text-xs">유료 컨텐츠</Badge>
+                          </div>
+                          <h4 className="font-medium line-clamp-1">{content.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {creator?.name} · {content.purchasedAt}
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="py-8 text-center">
+                <FileText className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">구매한 유료 컨텐츠가 없습니다</p>
+              </CardContent>
+            </Card>
+          )}
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Receipt className="w-5 h-5" />
+              구매 이력
+            </h3>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1"
+              onClick={() => navigate("/purchase-history")}
+              data-testid="button-view-all-history"
+            >
+              상세 보기
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          <div className="space-y-3">
+            {mockPurchaseHistory.slice(0, 3).map((item) => (
+              <Card key={item.id} data-testid={`history-preview-${item.id}`}>
+                <CardContent className="py-4">
+                  <div className="flex gap-4 items-center">
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${
+                      item.type === "course" 
+                        ? "bg-primary/10" 
+                        : item.type === "content"
+                        ? "bg-orange-100 dark:bg-orange-900/20"
+                        : "bg-blue-100 dark:bg-blue-900/20"
+                    }`}>
+                      {item.type === "course" ? (
+                        <BookOpen className="w-5 h-5 text-primary" />
+                      ) : item.type === "content" ? (
+                        <FileText className="w-5 h-5 text-orange-500" />
+                      ) : (
+                        <Video className="w-5 h-5 text-blue-500" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="text-xs">
+                          {item.type === "course" ? "강의" : item.type === "content" ? "컨텐츠" : "상담"}
+                        </Badge>
+                      </div>
+                      <h4 className="font-medium line-clamp-1">{item.itemName}</h4>
+                      <p className="text-sm text-muted-foreground">{item.purchasedAt}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-semibold">{item.price.toLocaleString()}원</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
+        <DialogContent className="max-w-md">
+          {refundComplete ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                  환불 완료
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-6 text-center">
+                <h3 className="text-lg font-semibold mb-2">환불이 완료되었습니다</h3>
+                <p className="text-muted-foreground">
+                  결제 수단에 따라 3~7일 내에 환불됩니다.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button onClick={() => setRefundDialogOpen(false)} className="w-full">
+                  확인
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <RotateCcw className="w-5 h-5" />
+                  강의 환불
+                </DialogTitle>
+                <DialogDescription>
+                  아래 강의를 환불 처리하시겠습니까?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                {refundCourse && (
+                  <div className="bg-muted rounded-lg p-4">
+                    <h4 className="font-medium mb-2">{refundCourse.course?.title}</h4>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">환불 금액</span>
+                      <span className="font-bold text-primary">{refundCourse.price.toLocaleString()}원</span>
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-4">
+                  * 시작하지 않은 강의만 환불이 가능합니다.
+                </p>
+              </div>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>
+                  취소
+                </Button>
+                <Button variant="destructive" onClick={handleRefundConfirm} data-testid="button-confirm-refund">
+                  환불하기
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>상담 예약 취소</AlertDialogTitle>
+            <AlertDialogDescription>
+              정말 이 상담을 취소하시겠습니까?
+              {cancelBooking && (
+                <div className="mt-4 p-4 bg-muted rounded-lg text-left">
+                  <p className="font-medium text-foreground">{getCreatorById(cancelBooking.creatorId)?.name} - {cancelBooking.productName}</p>
+                  <p className="text-sm mt-1">{cancelBooking.date} {cancelBooking.time}</p>
+                  <p className="text-sm font-semibold text-primary mt-2">환불 금액: {cancelBooking.price.toLocaleString()}원</p>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>돌아가기</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleCancelConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-cancel"
+            >
+              예약 취소
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default Profile;

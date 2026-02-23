@@ -1,0 +1,10 @@
+"use client"
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const PurchaseHistoryDetailPage = dynamic(() => import('@/pages/PurchaseHistory'), { ssr: false });
+
+export default function Page() {
+  return <PurchaseHistoryDetailPage />;
+}

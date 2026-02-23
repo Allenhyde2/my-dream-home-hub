@@ -1,0 +1,11 @@
+"use client"
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const MyCoursesPage = dynamic(() => import('@/pages/MyCourses'), { ssr: false });
+
+export const dynamic = 'force-dynamic';
+export default function Page() {
+  return <MyCoursesPage />;
+}

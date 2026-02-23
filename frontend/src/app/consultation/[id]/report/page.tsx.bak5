@@ -1,0 +1,11 @@
+"use client"
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const ConsultationReportPage = dynamic(() => import('@/pages/ConsultationReport'), { ssr: false });
+
+export const dynamic = 'force-dynamic';
+export default function Page() {
+  return <ConsultationReportPage />;
+}

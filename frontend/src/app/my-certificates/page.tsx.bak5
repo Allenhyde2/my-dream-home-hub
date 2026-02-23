@@ -1,0 +1,11 @@
+"use client"
+'use client';
+
+import dynamic from 'next/dynamic';
+
+const MyCertificatesPage = dynamic(() => import('@/pages/MyCertificates'), { ssr: false });
+
+export const dynamic = 'force-dynamic';
+export default function Page() {
+  return <MyCertificatesPage />;
+}

@@ -1,0 +1,392 @@
+"use client"
+import { useState } from "react";
+import { useNavigate } from "@/hooks/use-navigate";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { 
+  ArrowLeft, 
+  BookOpen, 
+  Play, 
+  Clock,
+  Award,
+  ChevronRight,
+  Calendar,
+  RotateCcw,
+  CheckCircle
+} from "lucide-react";
+import { getCourseById, LEVEL_DESCRIPTIONS } from "@/data/courses";
+
+interface EnrolledCourse {
+  courseId: number;
+  enrolledAt: string;
+  lastWatchedLessonId: number;
+  completedLessons: number[];
+  progress: number;
+  price: number;
+}
+
+const mockEnrolledCourses: EnrolledCourse[] = [
+  { courseId: 1, enrolledAt: "2026-01-15", lastWatchedLessonId: 5, completedLessons: [1, 2, 3, 4], progress: 33, price: 49000 },
+  { courseId: 6, enrolledAt: "2026-01-20", lastWatchedLessonId: 3, completedLessons: [1, 2], progress: 13, price: 89000 },
+  { courseId: 2, enrolledAt: "2026-01-25", lastWatchedLessonId: 1, completedLessons: [], progress: 0, price: 39000 },
+];
+
+const MyCourses = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("learning");
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [refundCourseId, setRefundCourseId] = useState<number | null>(null);
+  const [refundComplete, setRefundComplete] = useState(false);
+  const [enrolledCourses, setEnrolledCourses] = useState(mockEnrolledCourses);
+
+  const coursesWithDetails = enrolledCourses.map((enrolled) => ({
+    ...enrolled,
+    course: getCourseById(enrolled.courseId),
+  })).filter((item) => item.course);
+
+  const inProgressCourses = coursesWithDetails.filter((item) => item.progress > 0 && item.progress < 100);
+  const notStartedCourses = coursesWithDetails.filter((item) => item.progress === 0);
+  const completedCourses = coursesWithDetails.filter((item) => item.progress === 100);
+
+  const handleRefundClick = (courseId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRefundCourseId(courseId);
+    setRefundDialogOpen(true);
+    setRefundComplete(false);
+  };
+
+  const handleRefundConfirm = () => {
+    if (refundCourseId) {
+      setEnrolledCourses((prev) => prev.filter((c) => c.courseId !== refundCourseId));
+      setRefundComplete(true);
+    }
+  };
+
+  const refundCourse = refundCourseId ? coursesWithDetails.find((c) => c.courseId === refundCourseId) : null;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
+        <div className="container mx-auto px-4 py-3 flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate(-1)}
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="font-semibold">내 강의</h1>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-6 max-w-4xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="learning" data-testid="tab-learning">수강 내역</TabsTrigger>
+            <TabsTrigger value="certificates" data-testid="tab-certificates">수료증</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="learning" className="space-y-6">
+            {inProgressCourses.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Play className="w-5 h-5 text-primary" />
+                  이어보기
+                </h3>
+                <div className="space-y-4">
+                  {inProgressCourses.map((item) => {
+                    const course = item.course!;
+                    const levelInfo = LEVEL_DESCRIPTIONS[course.level];
+                    const currentLesson = course.lessons.find((l) => l.id === item.lastWatchedLessonId);
+                    
+                    return (
+                      <Card 
+                        key={item.courseId} 
+                        className="hover-elevate cursor-pointer"
+                        onClick={() => navigate(`/course/${item.courseId}/lecture/${item.lastWatchedLessonId}`)}
+                        data-testid={`continue-course-${item.courseId}`}
+                      >
+                        <CardContent className="py-4">
+                          <div className="flex gap-4">
+                            <div className={`w-20 h-20 rounded-lg ${levelInfo.color} flex items-center justify-center shrink-0`}>
+                              <BookOpen className="w-8 h-8 text-white/80" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  {course.level}
+                                </Badge>
+                              </div>
+                              <h4 className="font-medium line-clamp-1 mb-1">{course.title}</h4>
+                              <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
+                                {currentLesson?.title}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <Progress value={item.progress} className="flex-1 h-2" />
+                                <span className="text-sm text-muted-foreground">{item.progress}%</span>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="icon" className="shrink-0">
+                              <Play className="w-5 h-5" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {notStartedCourses.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  시작 전
+                </h3>
+                <div className="space-y-4">
+                  {notStartedCourses.map((item) => {
+                    const course = item.course!;
+                    const levelInfo = LEVEL_DESCRIPTIONS[course.level];
+                    
+                    return (
+                      <Card 
+                        key={item.courseId} 
+                        className="overflow-hidden"
+                        data-testid={`start-course-${item.courseId}`}
+                      >
+                        <CardContent className="py-4">
+                          <div className="flex gap-4 items-center">
+                            <div 
+                              className={`w-16 h-16 rounded-lg ${levelInfo.color} flex items-center justify-center shrink-0 cursor-pointer`}
+                              onClick={() => navigate(`/course/${item.courseId}/lecture/1`)}
+                            >
+                              <BookOpen className="w-6 h-6 text-white/80" />
+                            </div>
+                            <div 
+                              className="flex-1 min-w-0 cursor-pointer"
+                              onClick={() => navigate(`/course/${item.courseId}/lecture/1`)}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  {course.level}
+                                </Badge>
+                              </div>
+                              <h4 className="font-medium line-clamp-1">{course.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {course.lessonCount}개 강의 · {course.totalDuration}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="gap-1 text-destructive hover:text-destructive"
+                                onClick={(e) => handleRefundClick(item.courseId, e)}
+                                data-testid={`refund-course-${item.courseId}`}
+                              >
+                                <RotateCcw className="w-4 h-4" />
+                                환불
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="gap-1"
+                                onClick={() => navigate(`/course/${item.courseId}/lecture/1`)}
+                              >
+                                <Play className="w-4 h-4" />
+                                시작
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {completedCourses.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-green-500" />
+                  완료
+                </h3>
+                <div className="space-y-4">
+                  {completedCourses.map((item) => {
+                    const course = item.course!;
+                    const levelInfo = LEVEL_DESCRIPTIONS[course.level];
+                    
+                    return (
+                      <Card 
+                        key={item.courseId} 
+                        className="hover-elevate cursor-pointer"
+                        onClick={() => navigate(`/course/${item.courseId}`)}
+                        data-testid={`completed-course-${item.courseId}`}
+                      >
+                        <CardContent className="py-4">
+                          <div className="flex gap-4 items-center">
+                            <div className={`w-16 h-16 rounded-lg ${levelInfo.color} flex items-center justify-center shrink-0 relative`}>
+                              <BookOpen className="w-6 h-6 text-white/80" />
+                              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <Award className="w-3.5 h-3.5 text-white" />
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  {course.level}
+                                </Badge>
+                                <Badge className="text-xs bg-green-500">완료</Badge>
+                              </div>
+                              <h4 className="font-medium line-clamp-1">{course.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {course.instructor}
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {coursesWithDetails.length === 0 && (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">수강 중인 강의가 없습니다</h3>
+                  <p className="text-muted-foreground mb-4">
+                    지금 바로 강의를 둘러보고 학습을 시작해보세요!
+                  </p>
+                  <Button onClick={() => navigate("/")} data-testid="button-browse-courses">
+                    강의 둘러보기
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="certificates" className="space-y-4">
+            {completedCourses.length > 0 ? (
+              completedCourses.map((item) => {
+                const course = item.course!;
+                
+                return (
+                  <Card key={item.courseId} className="hover-elevate" data-testid={`certificate-${item.courseId}`}>
+                    <CardContent className="py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                          <Award className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{course.title}</h4>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                            <Calendar className="w-3.5 h-3.5" />
+                            수료일: {item.enrolledAt}
+                          </p>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          수료증 보기
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Award className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">아직 수료증이 없습니다</h3>
+                  <p className="text-muted-foreground">
+                    강의를 완료하면 수료증이 발급됩니다.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
+        <DialogContent className="max-w-md">
+          {refundComplete ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                  환불 완료
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-6 text-center">
+                <h3 className="text-lg font-semibold mb-2">환불이 완료되었습니다</h3>
+                <p className="text-muted-foreground">
+                  결제 수단에 따라 3~7일 내에 환불됩니다.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button onClick={() => setRefundDialogOpen(false)} className="w-full">
+                  확인
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <RotateCcw className="w-5 h-5" />
+                  강의 환불
+                </DialogTitle>
+                <DialogDescription>
+                  아래 강의를 환불 처리하시겠습니까?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                {refundCourse && (
+                  <div className="bg-muted rounded-lg p-4">
+                    <h4 className="font-medium mb-2">{refundCourse.course?.title}</h4>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">환불 금액</span>
+                      <span className="font-bold text-primary">{refundCourse.price.toLocaleString()}원</span>
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-4">
+                  * 시작하지 않은 강의만 환불이 가능합니다.
+                </p>
+              </div>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>
+                  취소
+                </Button>
+                <Button variant="destructive" onClick={handleRefundConfirm} data-testid="button-confirm-refund">
+                  환불하기
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default MyCourses;

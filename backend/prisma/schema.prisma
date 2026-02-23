@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String    @id @map("id")
+  email               String?   @unique
+  firstName           String?   @map("first_name")
+  lastName            String?   @map("last_name")
+  profileImageUrl     String?   @map("profile_image_url")
+  nickname            String?
+  residenceCity       String?   @map("residence_city")
+  residenceDistrict   String?   @map("residence_district")
+  residenceDong       String?   @map("residence_dong")
+  targetAreas         Json?     @map("target_areas")
+  purchaseTimeline    Int?      @map("purchase_timeline")
+  availableFunds      String?   @map("available_funds")
+  familyTypes         Json?     @map("family_types")
+  interests           Json?     @map("interests")
+  rewardPoints        Int?      @default(0) @map("reward_points")
+  onboardingCompleted Boolean?  @default(false) @map("onboarding_completed")
+  createdAt           DateTime? @default(now()) @map("created_at")
+  updatedAt           DateTime? @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Session {
+  sid    String   @id @map("sid")
+  sess   Json     @map("sess")
+  expire DateTime @map("expire")
+
+  @@map("sessions")
+}

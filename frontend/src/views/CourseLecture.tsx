@@ -1,0 +1,335 @@
+"use client"
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "@/hooks/use-navigate";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  ArrowLeft, 
+  Play, 
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  Maximize,
+  CheckCircle,
+  Circle,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
+  Clock
+} from "lucide-react";
+import { getCourseById } from "@/data/courses";
+
+const CourseLecture = () => {
+  const params = useParams<{ courseId: string; lessonId: string }>();
+  const courseId = params?.courseId;
+  const lessonId = params?.lessonId;
+  const navigate = useNavigate();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [completedLessons, setCompletedLessons] = useState<number[]>([]);
+  const [showSidebar, setShowSidebar] = useState(true);
+  const progressInterval = useRef<NodeJS.Timeout | null>(null);
+
+  if (!courseId || !lessonId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
+
+  const course = getCourseById(Number(courseId));
+  const currentLessonIndex = Number(lessonId) - 1;
+  const currentLesson = course?.lessons[currentLessonIndex];
+  
+  useEffect(() => {
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    setCurrentTime(0);
+    setIsPlaying(false);
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current);
+    }
+  }, [lessonId]);
+
+  if (!course || !currentLesson) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">강의를 찾을 수 없습니다</h2>
+          <Button onClick={() => navigate("/")} data-testid="button-go-home">
+            메인으로 돌아가기
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const duration = currentLesson.durationSeconds;
+  const progress = (currentTime / duration) * 100;
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+      setIsPlaying(false);
+    } else {
+      progressInterval.current = setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= duration) {
+            if (progressInterval.current) {
+              clearInterval(progressInterval.current);
+            }
+            setIsPlaying(false);
+            if (!completedLessons.includes(currentLesson.id)) {
+              setCompletedLessons([...completedLessons, currentLesson.id]);
+            }
+            return duration;
+          }
+          return prev + 1;
+        });
+      }, 100);
+      setIsPlaying(true);
+    }
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const goToLesson = (index: number) => {
+    if (index >= 0 && index < course.lessons.length) {
+      navigate(`/course/${courseId}/lecture/${index + 1}`);
+    }
+  };
+
+  const overallProgress = (completedLessons.length / course.lessons.length) * 100;
+
+  return (
+    <div className="min-h-screen bg-black flex flex-col">
+      <header className="bg-background border-b z-10">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate("/my-courses")}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <p className="text-sm text-muted-foreground">{course.title}</p>
+              <h1 className="font-semibold line-clamp-1">{currentLesson.title}</h1>
+            </div>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="gap-2"
+            data-testid="button-toggle-sidebar"
+          >
+            <BookOpen className="w-4 h-4" />
+            목차
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex-1 flex">
+        <div className={`flex-1 flex flex-col ${showSidebar ? 'lg:mr-80' : ''}`}>
+          <div className="flex-1 relative bg-gray-900 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center text-white">
+                <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+                  <BookOpen className="w-12 h-12 text-white/60" />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">{currentLesson.title}</h2>
+                <p className="text-white/60">강의 영상 영역</p>
+                <p className="text-sm text-white/40 mt-2">실제 서비스에서는 동영상이 재생됩니다</p>
+              </div>
+            </div>
+            
+            {isPlaying && (
+              <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-white/80 text-sm animate-pulse">
+                재생 중...
+              </div>
+            )}
+          </div>
+
+          <div className="bg-gray-900 px-4 py-3 space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-white/80 text-sm w-12">{formatTime(currentTime)}</span>
+              <div className="flex-1">
+                <Progress value={progress} className="h-1.5 bg-white/20" />
+              </div>
+              <span className="text-white/80 text-sm w-12 text-right">{formatTime(duration)}</span>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/10"
+                  onClick={() => setIsMuted(!isMuted)}
+                  data-testid="button-mute"
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </Button>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/10"
+                  onClick={() => goToLesson(currentLessonIndex - 1)}
+                  disabled={currentLessonIndex === 0}
+                  data-testid="button-prev-lesson"
+                >
+                  <SkipBack className="w-5 h-5" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/10 w-14 h-14"
+                  onClick={togglePlay}
+                  data-testid="button-play"
+                >
+                  {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/10"
+                  onClick={() => goToLesson(currentLessonIndex + 1)}
+                  disabled={currentLessonIndex === course.lessons.length - 1}
+                  data-testid="button-next-lesson"
+                >
+                  <SkipForward className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-white hover:bg-white/10"
+                  data-testid="button-fullscreen"
+                >
+                  <Maximize className="w-5 h-5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showSidebar && (
+          <div className="hidden lg:block fixed right-0 top-[57px] bottom-0 w-80 bg-background border-l">
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold">강의 목차</h3>
+                <Badge variant="secondary">
+                  {completedLessons.length}/{course.lessons.length}
+                </Badge>
+              </div>
+              <Progress value={overallProgress} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-1">
+                {overallProgress.toFixed(0)}% 완료
+              </p>
+            </div>
+            <ScrollArea className="h-[calc(100vh-180px)]">
+              <div className="p-2 space-y-1">
+                {course.lessons.map((lesson, index) => {
+                  const isCompleted = completedLessons.includes(lesson.id);
+                  const isCurrent = index === currentLessonIndex;
+                  
+                  return (
+                    <button
+                      key={lesson.id}
+                      onClick={() => goToLesson(index)}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        isCurrent 
+                          ? 'bg-primary/10 border border-primary/20' 
+                          : 'hover:bg-muted'
+                      }`}
+                      data-testid={`sidebar-lesson-${lesson.id}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-0.5">
+                          {isCompleted ? (
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                          ) : (
+                            <Circle className={`w-5 h-5 ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium line-clamp-2 ${isCurrent ? 'text-primary' : ''}`}>
+                            {index + 1}. {lesson.title}
+                          </p>
+                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                            <Clock className="w-3 h-3" />
+                            <span>{lesson.duration}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+      </div>
+
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t p-4">
+        <div className="flex items-center justify-between gap-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => goToLesson(currentLessonIndex - 1)}
+            disabled={currentLessonIndex === 0}
+            className="gap-1"
+            data-testid="button-prev-mobile"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            이전
+          </Button>
+          <div className="text-center">
+            <p className="text-sm font-medium">{currentLessonIndex + 1} / {course.lessons.length}</p>
+            <Progress value={overallProgress} className="w-24 h-1.5 mt-1" />
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => goToLesson(currentLessonIndex + 1)}
+            disabled={currentLessonIndex === course.lessons.length - 1}
+            className="gap-1"
+            data-testid="button-next-mobile"
+          >
+            다음
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CourseLecture;

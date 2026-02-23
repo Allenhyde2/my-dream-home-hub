@@ -1,0 +1,240 @@
+import { useState } from "react";
+import { useNavigate } from "@/hooks/use-navigate";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { 
+  ArrowLeft, 
+  Calendar,
+  Clock,
+  X,
+  CheckCircle,
+  FileText,
+  ChevronRight,
+  Video
+} from "lucide-react";
+import { creators } from "@/data/creators";
+
+interface ConsultationBooking {
+  id: number;
+  creatorId: number;
+  productName: string;
+  date: string;
+  time: string;
+  price: number;
+  status: "upcoming" | "completed" | "cancelled";
+}
+
+const mockConsultations: ConsultationBooking[] = [
+  { id: 1, creatorId: 1, productName: "30분 기본 상담", date: "2026-02-05", time: "14:00", price: 50000, status: "upcoming" },
+  { id: 2, creatorId: 2, productName: "1시간 심층 상담", date: "2026-02-10", time: "10:00", price: 100000, status: "upcoming" },
+  { id: 3, creatorId: 1, productName: "30분 기본 상담", date: "2026-01-20", time: "15:00", price: 50000, status: "completed" },
+  { id: 4, creatorId: 3, productName: "프리미엄 컨설팅", date: "2026-01-15", time: "13:00", price: 200000, status: "completed" },
+  { id: 5, creatorId: 2, productName: "30분 기본 상담", date: "2026-01-10", time: "11:00", price: 50000, status: "cancelled" },
+];
+
+const MyReservations = () => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("upcoming");
+  const [consultations, setConsultations] = useState(mockConsultations);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelBookingId, setCancelBookingId] = useState<number | null>(null);
+
+  const upcomingConsultations = consultations.filter((c) => c.status === "upcoming");
+  const pastConsultations = consultations.filter((c) => c.status === "completed" || c.status === "cancelled");
+
+  const getCreatorById = (creatorId: number) => {
+    return creators.find((c) => c.id === creatorId);
+  };
+
+  const handleCancelClick = (bookingId: number) => {
+    setCancelBookingId(bookingId);
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelConfirm = () => {
+    if (cancelBookingId) {
+      setConsultations((prev) => 
+        prev.map((c) => 
+          c.id === cancelBookingId ? { ...c, status: "cancelled" as const } : c
+        )
+      );
+      setCancelDialogOpen(false);
+    }
+  };
+
+  const cancelBooking = cancelBookingId ? consultations.find((c) => c.id === cancelBookingId) : null;
+
+  const renderConsultationCard = (booking: ConsultationBooking, showActions: boolean) => {
+    const creator = getCreatorById(booking.creatorId);
+    
+    return (
+      <Card 
+        key={booking.id} 
+        className={`${booking.status === "completed" ? "cursor-pointer hover-elevate" : ""}`}
+        onClick={() => booking.status === "completed" && navigate(`/consultation/${booking.id}/report`)}
+        data-testid={`consultation-${booking.id}`}
+      >
+        <CardContent className="py-4">
+          <div className="flex gap-4 items-center">
+            <Avatar className="w-14 h-14">
+              <AvatarImage src={creator?.avatar} alt={creator?.name} />
+              <AvatarFallback>{creator?.name.slice(0, 2)}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                {booking.status === "upcoming" && (
+                  <Badge className="text-xs bg-blue-500">예약됨</Badge>
+                )}
+                {booking.status === "completed" && (
+                  <Badge className="text-xs bg-green-600">완료</Badge>
+                )}
+                {booking.status === "cancelled" && (
+                  <Badge variant="secondary" className="text-xs">취소됨</Badge>
+                )}
+              </div>
+              <h4 className="font-medium">{creator?.name} - {booking.productName}</h4>
+              <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                <Calendar className="w-3.5 h-3.5" />
+                {booking.date} {booking.time}
+              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {booking.price.toLocaleString()}원
+              </p>
+            </div>
+            {showActions && booking.status === "upcoming" && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1 text-destructive hover:text-destructive shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCancelClick(booking.id);
+                }}
+                data-testid={`cancel-consultation-${booking.id}`}
+              >
+                <X className="w-4 h-4" />
+                취소
+              </Button>
+            )}
+            {booking.status === "completed" && (
+              <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+                <FileText className="w-4 h-4" />
+                <span className="text-sm">리포트 보기</span>
+                <ChevronRight className="w-4 h-4" />
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b">
+        <div className="container mx-auto px-4 py-3 flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate(-1)}
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="font-semibold">예약 현황</h1>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-6 max-w-4xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="upcoming" data-testid="tab-upcoming">
+              예약 목록 ({upcomingConsultations.length})
+            </TabsTrigger>
+            <TabsTrigger value="past" data-testid="tab-past">
+              이전 예약 ({pastConsultations.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upcoming" className="space-y-4">
+            {upcomingConsultations.length > 0 ? (
+              upcomingConsultations.map((booking) => renderConsultationCard(booking, true))
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Video className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground mb-4">예약된 상담이 없습니다</p>
+                  <Button onClick={() => navigate("/")} data-testid="button-explore">
+                    전문가 둘러보기
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="past" className="space-y-4">
+            {pastConsultations.length > 0 ? (
+              <>
+                <p className="text-sm text-muted-foreground mb-2">
+                  완료된 상담을 선택하면 상담 리포트를 확인할 수 있습니다.
+                </p>
+                {pastConsultations.map((booking) => renderConsultationCard(booking, false))}
+              </>
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">이전 예약 내역이 없습니다</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>상담 예약을 취소하시겠습니까?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {cancelBooking && (
+                <>
+                  <span className="font-medium">{getCreatorById(cancelBooking.creatorId)?.name}</span>님과의 
+                  <span className="font-medium"> {cancelBooking.productName}</span> 예약을 취소합니다.
+                  <br />
+                  예약 일시: {cancelBooking.date} {cancelBooking.time}
+                  <br /><br />
+                  취소 시 결제 금액이 환불됩니다.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>돌아가기</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleCancelConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              예약 취소
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+};
+
+export default MyReservations;
