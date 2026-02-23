@@ -51,7 +51,7 @@ const Index = () => {
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
 
   const handleTestOnboarding = () => {
-    window.location.href = '/api/login/test?redirect=/';
+    navigate('/signup');
   };
 
   const handleOnboardingExit = () => {

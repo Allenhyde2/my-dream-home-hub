@@ -514,73 +514,73 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
       <div className="min-h-screen bg-background flex flex-col">
         {!showRewardAnimation ? (
           <>
-          <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-            {/* Welcome illustration */}
-            <div className="relative w-56 h-56 mb-8">
-              <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="100" cy="100" r="95" fill="url(#skyGrad)" />
-                <ellipse cx="100" cy="160" rx="80" ry="12" fill="#86EFAC" opacity="0.6" />
-                <rect x="60" y="95" width="80" height="60" rx="4" fill="#F9A8D4" />
-                <path d="M50 100 L100 60 L150 100" fill="#FB7185" stroke="#E11D48" strokeWidth="2" strokeLinejoin="round" />
-                <rect x="88" y="120" width="24" height="35" rx="3" fill="#7C3AED" />
-                <circle cx="106" cy="140" r="2.5" fill="#FDE68A" />
-                <rect x="66" y="105" width="16" height="16" rx="2" fill="#BFDBFE" stroke="#93C5FD" strokeWidth="1.5" />
-                <line x1="74" y1="105" x2="74" y2="121" stroke="#93C5FD" strokeWidth="1" />
-                <line x1="66" y1="113" x2="82" y2="113" stroke="#93C5FD" strokeWidth="1" />
-                <rect x="118" y="105" width="16" height="16" rx="2" fill="#BFDBFE" stroke="#93C5FD" strokeWidth="1.5" />
-                <line x1="126" y1="105" x2="126" y2="121" stroke="#93C5FD" strokeWidth="1" />
-                <line x1="118" y1="113" x2="134" y2="113" stroke="#93C5FD" strokeWidth="1" />
-                <rect x="120" y="65" width="14" height="25" rx="2" fill="#FDA4AF" />
-                <path d="M100 42 C95 32, 80 32, 80 42 C80 52, 100 62, 100 62 C100 62, 120 52, 120 42 C120 32, 105 32, 100 42Z" fill="#F43F5E" opacity="0.9" />
-                <circle cx="40" cy="45" r="3" fill="#FDE68A" />
-                <circle cx="160" cy="50" r="2.5" fill="#FDE68A" />
-                <circle cx="55" cy="30" r="2" fill="#FDE68A" />
-                <circle cx="150" cy="35" r="2" fill="#FDE68A" />
-                <ellipse cx="35" cy="70" rx="18" ry="8" fill="white" opacity="0.7" />
-                <ellipse cx="28" cy="68" rx="10" ry="7" fill="white" opacity="0.7" />
-                <ellipse cx="170" cy="75" rx="16" ry="7" fill="white" opacity="0.7" />
-                <ellipse cx="178" cy="73" rx="10" ry="6" fill="white" opacity="0.7" />
-                <defs>
-                  <radialGradient id="skyGrad" cx="0.5" cy="0.3" r="0.7">
-                    <stop offset="0%" stopColor="#DBEAFE" />
-                    <stop offset="100%" stopColor="#EFF6FF" />
-                  </radialGradient>
-                </defs>
-              </svg>
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+              {/* Welcome illustration */}
+              <div className="relative w-56 h-56 mb-8">
+                <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="100" r="95" fill="url(#skyGrad)" />
+                  <ellipse cx="100" cy="160" rx="80" ry="12" fill="#86EFAC" opacity="0.6" />
+                  <rect x="60" y="95" width="80" height="60" rx="4" fill="#F9A8D4" />
+                  <path d="M50 100 L100 60 L150 100" fill="#FB7185" stroke="#E11D48" strokeWidth="2" strokeLinejoin="round" />
+                  <rect x="88" y="120" width="24" height="35" rx="3" fill="#7C3AED" />
+                  <circle cx="106" cy="140" r="2.5" fill="#FDE68A" />
+                  <rect x="66" y="105" width="16" height="16" rx="2" fill="#BFDBFE" stroke="#93C5FD" strokeWidth="1.5" />
+                  <line x1="74" y1="105" x2="74" y2="121" stroke="#93C5FD" strokeWidth="1" />
+                  <line x1="66" y1="113" x2="82" y2="113" stroke="#93C5FD" strokeWidth="1" />
+                  <rect x="118" y="105" width="16" height="16" rx="2" fill="#BFDBFE" stroke="#93C5FD" strokeWidth="1.5" />
+                  <line x1="126" y1="105" x2="126" y2="121" stroke="#93C5FD" strokeWidth="1" />
+                  <line x1="118" y1="113" x2="134" y2="113" stroke="#93C5FD" strokeWidth="1" />
+                  <rect x="120" y="65" width="14" height="25" rx="2" fill="#FDA4AF" />
+                  <path d="M100 42 C95 32, 80 32, 80 42 C80 52, 100 62, 100 62 C100 62, 120 52, 120 42 C120 32, 105 32, 100 42Z" fill="#F43F5E" opacity="0.9" />
+                  <circle cx="40" cy="45" r="3" fill="#FDE68A" />
+                  <circle cx="160" cy="50" r="2.5" fill="#FDE68A" />
+                  <circle cx="55" cy="30" r="2" fill="#FDE68A" />
+                  <circle cx="150" cy="35" r="2" fill="#FDE68A" />
+                  <ellipse cx="35" cy="70" rx="18" ry="8" fill="white" opacity="0.7" />
+                  <ellipse cx="28" cy="68" rx="10" ry="7" fill="white" opacity="0.7" />
+                  <ellipse cx="170" cy="75" rx="16" ry="7" fill="white" opacity="0.7" />
+                  <ellipse cx="178" cy="73" rx="10" ry="6" fill="white" opacity="0.7" />
+                  <defs>
+                    <radialGradient id="skyGrad" cx="0.5" cy="0.3" r="0.7">
+                      <stop offset="0%" stopColor="#DBEAFE" />
+                      <stop offset="100%" stopColor="#EFF6FF" />
+                    </radialGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              {/* Welcome text */}
+              <h2 className="text-2xl font-bold leading-snug mb-3">
+                반가워요, {data.nickname}님!
+              </h2>
+              {areaLabel ? (
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  <span className="font-semibold text-primary">{areaLabel}</span> 맞춤 정보를
+                  <br />
+                  지금 확인해보세요
+                </p>
+              ) : (
+                <p className="text-muted-foreground leading-relaxed text-lg">
+                  맞춤 부동산 정보를
+                  <br />
+                  지금 확인해보세요
+                </p>
+              )}
             </div>
 
-            {/* Welcome text */}
-            <h2 className="text-2xl font-bold leading-snug mb-3">
-              반가워요, {data.nickname}님!
-            </h2>
-            {areaLabel ? (
-              <p className="text-muted-foreground leading-relaxed text-lg">
-                <span className="font-semibold text-primary">{areaLabel}</span> 맞춤 정보를
-                <br />
-                지금 확인해보세요
-              </p>
-            ) : (
-              <p className="text-muted-foreground leading-relaxed text-lg">
-                맞춤 부동산 정보를
-                <br />
-                지금 확인해보세요
-              </p>
-            )}
-          </div>
-
-          {/* Fixed bottom CTA */}
-          <div className="p-6 pb-10">
-            <Button
-              data-testid="button-claim-reward"
-              size="lg"
-              className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg py-7 text-base rounded-xl"
-              onClick={handleRewardClick}
-              disabled={updateMutation.isPending}
-            >
-              <Gift className="w-5 h-5" />
-              {updateMutation.isPending ? "처리 중..." : "3,000 리워드와 함께 시작"}
-            </Button>
-          </div>
+            {/* Fixed bottom CTA */}
+            <div className="p-6 pb-10">
+              <Button
+                data-testid="button-claim-reward"
+                size="lg"
+                className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg py-7 text-base rounded-xl"
+                onClick={handleRewardClick}
+                disabled={updateMutation.isPending}
+              >
+                <Gift className="w-5 h-5" />
+                {updateMutation.isPending ? "처리 중..." : "3,000 리워드와 함께 시작"}
+              </Button>
+            </div>
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center gap-8">
@@ -1233,117 +1233,87 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
         )}
 
         {step === 7 && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                가족 형태
-              </CardTitle>
-              <CardDescription>
-                해당하는 가족 형태를 선택해주세요 (최대 3개)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6 pb-8">
-              <div className="grid grid-cols-2 gap-3">
-                {FAMILY_TYPES.map((type) => {
-                  const isSelected = data.familyTypes.includes(type);
-                  const isDisabled = !isSelected && data.familyTypes.length >= 3;
-                  return (
-                    <button
-                      key={type}
-                      data-testid={`family-type-${type}`}
-                      onClick={() => toggleFamilyType(type)}
-                      disabled={isDisabled}
-                      className={cn(
-                        "relative flex items-center gap-2.5 px-4 py-3.5 rounded-xl border text-sm transition-all text-left",
-                        isSelected
-                          ? "bg-primary/10 border-primary text-foreground font-medium ring-1 ring-primary/30"
-                          : "bg-background border-border text-foreground hover:border-primary/40 hover:bg-accent/50",
-                        isDisabled && "opacity-40 cursor-not-allowed"
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                          isSelected
-                            ? "bg-primary border-primary"
-                            : "border-muted-foreground/30"
-                        )}
-                      >
-                        {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
-                      </div>
-                      {type}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-5 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  선택: <span className="font-medium text-foreground">{data.familyTypes.length}</span>/3
-                </span>
-                {data.familyTypes.length >= 3 && (
-                  <span className="text-xs text-muted-foreground">최대 선택 완료</span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="pt-8">
+            <h2 className="text-2xl font-bold leading-snug mb-2 flex items-center gap-2">
+              가족 형태
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              해당하는 가족 형태를 선택해주세요 (최대 3개)
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {FAMILY_TYPES.map((type) => {
+                const isSelected = data.familyTypes.includes(type);
+                const isDisabled = !isSelected && data.familyTypes.length >= 3;
+                return (
+                  <button
+                    key={type}
+                    data-testid={`family-type-${type}`}
+                    onClick={() => toggleFamilyType(type)}
+                    disabled={isDisabled}
+                    className={cn(
+                      "flex items-center justify-center px-4 py-3.5 rounded-xl border text-sm font-semibold transition-all text-center",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm ring-1 ring-primary/30"
+                        : "bg-background text-foreground border-border hover:border-primary/40 hover:bg-accent/50",
+                      isDisabled && "opacity-40 cursor-not-allowed"
+                    )}
+                  >
+                    {type}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-5 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                선택: <span className="font-medium text-foreground">{data.familyTypes.length}</span>/3
+              </span>
+              {data.familyTypes.length >= 3 && (
+                <span className="text-xs text-muted-foreground">최대 선택 완료</span>
+              )}
+            </div>
+          </div>
         )}
 
         {step === 8 && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2">
-                <Heart className="w-5 h-5" />
-                관심사 및 고민
-              </CardTitle>
-              <CardDescription>
-                관심있는 주제를 선택해주세요 (최대 5개)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6 pb-8">
-              <div className="grid grid-cols-2 gap-3">
-                {INTEREST_OPTIONS.map((interest) => {
-                  const isSelected = data.interests.includes(interest);
-                  const isDisabled = !isSelected && data.interests.length >= 5;
-                  return (
-                    <button
-                      key={interest}
-                      data-testid={`interest-${interest}`}
-                      onClick={() => toggleInterest(interest)}
-                      disabled={isDisabled}
-                      className={cn(
-                        "relative flex items-center gap-2.5 px-4 py-3.5 rounded-xl border text-sm transition-all text-left",
-                        isSelected
-                          ? "bg-primary/10 border-primary text-foreground font-medium ring-1 ring-primary/30"
-                          : "bg-background border-border text-foreground hover:border-primary/40 hover:bg-accent/50",
-                        isDisabled && "opacity-40 cursor-not-allowed"
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors",
-                          isSelected
-                            ? "bg-primary border-primary"
-                            : "border-muted-foreground/30"
-                        )}
-                      >
-                        {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
-                      </div>
-                      {interest}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-5 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  선택: <span className="font-medium text-foreground">{data.interests.length}</span>/5
-                </span>
-                {data.interests.length >= 5 && (
-                  <span className="text-xs text-muted-foreground">최대 선택 완료</span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="pt-8">
+            <h2 className="text-2xl font-bold leading-snug mb-2 flex items-center gap-2">
+              관심사 및 고민
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              관심있는 주제를 선택해주세요 (최대 5개)
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {INTEREST_OPTIONS.map((interest) => {
+                const isSelected = data.interests.includes(interest);
+                const isDisabled = !isSelected && data.interests.length >= 5;
+                return (
+                  <button
+                    key={interest}
+                    data-testid={`interest-${interest}`}
+                    onClick={() => toggleInterest(interest)}
+                    disabled={isDisabled}
+                    className={cn(
+                      "flex items-center justify-center px-4 py-3.5 rounded-xl border text-sm font-semibold transition-all text-center",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary shadow-sm ring-1 ring-primary/30"
+                        : "bg-background text-foreground border-border hover:border-primary/40 hover:bg-accent/50",
+                      isDisabled && "opacity-40 cursor-not-allowed"
+                    )}
+                  >
+                    {interest}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-5 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                선택: <span className="font-medium text-foreground">{data.interests.length}</span>/5
+              </span>
+              {data.interests.length >= 5 && (
+                <span className="text-xs text-muted-foreground">최대 선택 완료</span>
+              )}
+            </div>
+          </div>
         )}
 
       </div>
