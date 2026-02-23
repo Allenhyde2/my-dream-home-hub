@@ -194,7 +194,10 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showRewardAnimation, setShowRewardAnimation] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showFadeOut, setShowFadeOut] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+
 
   const [data, setData] = useState<OnboardingData>({
     nickname: "",
@@ -469,28 +472,93 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
     }
   };
 
-  const fireRewardAnimation = async () => {
+  const fireRewardAnimation = async (buttonRect?: DOMRect) => {
     setShowRewardAnimation(true);
 
     const confetti = (await import("canvas-confetti")).default;
     const colors = ["#FFD700", "#FFA500", "#FFEC8B", "#DAA520", "#F5DEB3"];
-    confetti({ particleCount: 100, spread: 120, origin: { y: 0.5 }, colors, gravity: 0.7 });
-    setTimeout(() => confetti({ particleCount: 60, spread: 80, origin: { y: 0.45, x: 0.35 }, colors, gravity: 0.8 }), 400);
-    setTimeout(() => confetti({ particleCount: 60, spread: 80, origin: { y: 0.45, x: 0.65 }, colors, gravity: 0.8 }), 700);
+    
+    const origin = buttonRect 
+      ? { 
+          x: (buttonRect.left + buttonRect.width / 2) / window.innerWidth,
+          y: (buttonRect.top) / window.innerHeight 
+        }
+      : { y: 0.85 };
+
+    confetti({ 
+      particleCount: 80, 
+      spread: 100, 
+      origin, 
+      colors, 
+      gravity: 0.6,
+      startVelocity: 35,
+      angle: 90,
+    });
+    
+    setTimeout(() => confetti({ 
+      particleCount: 60, 
+      spread: 70, 
+      origin: { y: 0.4, x: 0.35 }, 
+      colors, 
+      gravity: 0.7 
+    }), 300);
+    
+    setTimeout(() => confetti({ 
+      particleCount: 60, 
+      spread: 70, 
+      origin: { y: 0.4, x: 0.65 }, 
+      colors, 
+      gravity: 0.7 
+    }), 500);
   };
 
-  const handleRewardClick = async () => {
-    fireRewardAnimation();
-
-    // 애니메이션(3초)과 프로필 저장을 병렬 실행, 둘 다 완료 후 이동
-    const animationDelay = new Promise((r) => setTimeout(r, 3000));
+  const handleRewardClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const button = e.currentTarget;
+    const buttonRect = button.getBoundingClientRect();
+    
+    setIsProcessing(true);
+    
     const saveProfile = updateMutation.mutateAsync(data).catch((error) => {
       console.error("Failed to save profile:", error);
     });
 
-    await Promise.all([animationDelay, saveProfile]);
+    await new Promise((r) => setTimeout(r, 800));
+    
+    setIsProcessing(false);
+    fireRewardAnimation(buttonRect);
+
+    await Promise.all([
+      new Promise((r) => setTimeout(r, 2500)),
+      saveProfile,
+    ]);
+    
+    setShowFadeOut(true);
+    
+    await new Promise((r) => setTimeout(r, 500));
+    
     navigateAfterComplete();
   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const currentDistricts = getDistrictsByCity(selectedCity);
   const currentDongs = useMemo(() => {
@@ -511,6 +579,26 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
     const areaLabel = topArea ? `${topArea.district} ${topArea.dong}` : "";
 
     return (
+      <div className={cn(
+        "min-h-screen bg-background flex flex-col relative transition-opacity duration-500",
+        showFadeOut && "opacity-0"
+      )}>
+        {/* Dim overlay during processing */}
+        {isProcessing && (
+          <div 
+            className="absolute inset-0 bg-black/60 z-10 flex items-center justify-center"
+            style={{ animation: "fadeIn 0.3s ease-out" }}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                <Gift className="w-8 h-8 text-primary animate-pulse" />
+              </div>
+              <p className="text-white text-lg font-medium">지급 중...</p>
+            </div>
+          </div>
+        )}
+        
+        {!showRewardAnimation ? (
       <div className="min-h-screen bg-background flex flex-col">
         {!showRewardAnimation ? (
           <>
@@ -575,10 +663,12 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
                 size="lg"
                 className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg py-7 text-base rounded-xl"
                 onClick={handleRewardClick}
-                disabled={updateMutation.isPending}
+                disabled={updateMutation.isPending || isProcessing}
+
               >
                 <Gift className="w-5 h-5" />
-                {updateMutation.isPending ? "처리 중..." : "3,000 리워드와 함께 시작"}
+                {isProcessing ? "지급 중..." : updateMutation.isPending ? "처리 중..." : "3,000 리워드와 함께 시작"}
+
               </Button>
             </div>
           </>
@@ -624,7 +714,12 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
           </div>
         )}
         <style>{`
+          @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+          }
           @keyframes coinBurst {
+
             0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
             50% { opacity: 1; }
             100% { transform: translate(calc(-50% + var(--coin-x)), calc(-50% + var(--coin-y))) scale(1.3); opacity: 0; }
