@@ -198,7 +198,6 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
   const [showFadeOut, setShowFadeOut] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
 
-
   const [data, setData] = useState<OnboardingData>({
     nickname: "",
     residenceCity: "",
@@ -539,27 +538,6 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
     navigateAfterComplete();
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const currentDistricts = getDistrictsByCity(selectedCity);
   const currentDongs = useMemo(() => {
     if (!selectedDistrict) return [];
@@ -598,8 +576,6 @@ export default function Onboarding({ isEmbedded, onClose, onComplete }: Onboardi
           </div>
         )}
         
-        {!showRewardAnimation ? (
-      <div className="min-h-screen bg-background flex flex-col">
         {!showRewardAnimation ? (
           <>
             <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
