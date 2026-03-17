@@ -1,17 +1,16 @@
 "use client"
 import { useState, useMemo } from "react";
 import { CalendarDays, Search } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table";
-import { ko } from "date-fns/locale";
 import { mockConsultationBookings, type ConsultationBookingRecord } from "@/data/creator-studio";
+import SchedulerCalendar from "./SchedulerCalendar";
 
 const statusConfig: Record<string, { label: string; className?: string; variant?: "secondary" | "destructive" }> = {
   confirmed: { label: "확정", className: "bg-green-600 text-white border-transparent" },
@@ -29,14 +28,10 @@ export default function ConsultationScheduler({ onNavigateToRoom }: Props) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const bookedDates = useMemo(() => {
-    return mockConsultationBookings.map((b) => new Date(b.date + "T00:00:00"));
-  }, []);
-
   const filteredBookings = useMemo(() => {
     return mockConsultationBookings.filter((b) => {
       if (selectedDate) {
-        const selected = selectedDate.toISOString().split("T")[0];
+        const selected = format(selectedDate, "yyyy-MM-dd");
         if (b.date !== selected) return false;
       }
       if (searchQuery && !b.clientName.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -45,14 +40,6 @@ export default function ConsultationScheduler({ onNavigateToRoom }: Props) {
     });
   }, [selectedDate, searchQuery, statusFilter]);
 
-  const handleDateSelect = (date: Date | undefined) => {
-    if (selectedDate && date && selectedDate.toDateString() === date.toDateString()) {
-      setSelectedDate(undefined);
-    } else {
-      setSelectedDate(date);
-    }
-  };
-
   return (
     <div data-testid="content-consultation-scheduler" className="space-y-6">
       <div className="flex items-center gap-2">
@@ -60,19 +47,11 @@ export default function ConsultationScheduler({ onNavigateToRoom }: Props) {
         <h3 className="text-lg font-semibold">상담 예약 스케줄러</h3>
       </div>
 
-      <Card>
-        <CardContent className="pt-6 flex justify-center">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateSelect}
-            locale={ko}
-            modifiers={{ booked: bookedDates }}
-            modifiersStyles={{ booked: { fontWeight: "bold", textDecoration: "underline" } }}
-            data-testid="scheduler-calendar"
-          />
-        </CardContent>
-      </Card>
+      <SchedulerCalendar
+        bookings={mockConsultationBookings}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+      />
 
       {selectedDate && (
         <div className="flex items-center gap-2">

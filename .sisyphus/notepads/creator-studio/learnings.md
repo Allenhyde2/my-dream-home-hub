@@ -53,3 +53,36 @@
 - Playwright `getByTestId` works with data-testid attributes on sidebar buttons
 - Content switches correctly: heading updates + main content area replaces
 - 6 screenshots captured in `.sisyphus/evidence/`
+
+## Task: Rich Scheduler Calendar Visual QA (2026-03-17)
+
+### Calendar Component
+- Custom calendar grid (no react-day-picker / `.rdp` class)
+- 7-column CSS grid (`grid grid-cols-7`) with Korean day headers: 일 월 화 수 목 금 토
+- Count badges: "N건" pill-shaped indicators on dates with bookings
+- Booking previews: colored status dots + time + client name (e.g., "● 10:00 한소희")
+- Status dot colors: green=완료/확정, blue=대기(?), red=취소
+
+### Test IDs
+- `scheduler-calendar` — main calendar container
+- `calendar-prev` / `calendar-next` — month navigation buttons
+- `calendar-cell-{YYYY-MM-DD}` — individual date cells
+- `clear-date-filter` — "전체 보기" button to reset date filter
+
+### Month Navigation
+- Title format: "2026년 N월"
+- Prev/next buttons update calendar grid with correct month's bookings
+- Overflow dates (from adjacent months) rendered in lighter style
+
+### BUG FOUND: Date Filter Timezone Issue
+- **File**: `ConsultationScheduler.tsx` line 33
+- **Code**: `selectedDate.toISOString().split("T")[0]`
+- **Problem**: `new Date(2026, 2, 18)` in Asia/Seoul (UTC+9) → `.toISOString()` returns `"2026-03-17T15:00:00.000Z"` → `.split("T")[0]` = `"2026-03-17"` (wrong day!)
+- **Effect**: Clicking any calendar date shows "예약이 없습니다" (no bookings) because the filter compares UTC date vs local date
+- **Fix needed**: Use `format(selectedDate, "yyyy-MM-dd")` from date-fns instead of `.toISOString().split("T")[0]`
+
+### Evidence Screenshots
+- `rich-cal-overview.png` — Full calendar with bookings, badges, table (156KB)
+- `rich-cal-prev-month.png` — February 2026 view (59KB)
+- `rich-cal-next-month.png` — April 2026 view (54KB)
+- `rich-cal-date-filter.png` — Date filter active showing bug (71KB)
