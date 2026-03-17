@@ -92,13 +92,27 @@ export interface AIConsultationRecord {
   followUpNeeded: boolean;
 }
 
+export interface AIConsultationDetailRecord {
+  id: number;
+  clientName: string;
+  date: string;
+  duration: string;
+  summary: string;
+  keyPoints: string[];
+  recommendations: string[];
+  actionItems: string[];
+  marketAnalysis?: string;
+  riskFactors?: string[];
+  sentiment: "positive" | "neutral" | "negative";
+  keyTopics: string[];
+}
+
 // ─── Section Keys ─────────────────────────────────────────────
 
 export const SECTION_KEYS = [
   "course-sales",
   "course-management",
   "consultation-scheduler",
-  "consultation-notifications",
   "available-time-settings",
   "consultation-room",
   "ai-consultation-history",
@@ -267,9 +281,83 @@ export const mockStudentActivity: Record<number, StudentActivityRecord[]> = {
 };
 
 export const mockConsultationBookings: ConsultationBookingRecord[] = [
+  // ── February 2026 ──
   {
     id: 1,
     clientName: "김철수",
+    date: "2026-02-05",
+    time: "10:00",
+    type: "재건축 상담",
+    status: "completed",
+    price: 150000,
+  },
+  {
+    id: 2,
+    clientName: "이영희",
+    date: "2026-02-10",
+    time: "14:00",
+    type: "청약 전략 상담",
+    status: "completed",
+    price: 120000,
+  },
+  {
+    id: 3,
+    clientName: "박민수",
+    date: "2026-02-14",
+    time: "11:00",
+    type: "절세 상담",
+    status: "completed",
+    price: 150000,
+  },
+  {
+    id: 4,
+    clientName: "최지은",
+    date: "2026-02-18",
+    time: "15:00",
+    type: "경매 상담",
+    status: "cancelled",
+    price: 130000,
+  },
+  {
+    id: 5,
+    clientName: "정하늘",
+    date: "2026-02-25",
+    time: "09:00",
+    type: "분양권 상담",
+    status: "completed",
+    price: 120000,
+  },
+  // ── March 2026 ──
+  {
+    id: 6,
+    clientName: "한소희",
+    date: "2026-03-03",
+    time: "10:00",
+    type: "GTX 역세권 상담",
+    status: "completed",
+    price: 140000,
+  },
+  {
+    id: 7,
+    clientName: "오민재",
+    date: "2026-03-08",
+    time: "13:00",
+    type: "전세 전환 상담",
+    status: "confirmed",
+    price: 110000,
+  },
+  {
+    id: 8,
+    clientName: "윤채원",
+    date: "2026-03-12",
+    time: "15:00",
+    type: "갭투자 상담",
+    status: "pending",
+    price: 130000,
+  },
+  {
+    id: 9,
+    clientName: "송지호",
     date: "2026-03-18",
     time: "10:00",
     type: "재건축 상담",
@@ -277,40 +365,59 @@ export const mockConsultationBookings: ConsultationBookingRecord[] = [
     price: 150000,
   },
   {
-    id: 2,
-    clientName: "이영희",
-    date: "2026-03-18",
+    id: 10,
+    clientName: "강예린",
+    date: "2026-03-22",
     time: "14:00",
+    type: "리모델링 상담",
+    status: "cancelled",
+    price: 120000,
+  },
+  // ── April 2026 ──
+  {
+    id: 11,
+    clientName: "임도현",
+    date: "2026-04-02",
+    time: "11:00",
     type: "청약 전략 상담",
     status: "pending",
     price: 120000,
   },
   {
-    id: 3,
-    clientName: "박민수",
-    date: "2026-03-19",
-    time: "11:00",
-    type: "절세 상담",
-    status: "confirmed",
-    price: 150000,
-  },
-  {
-    id: 4,
-    clientName: "최지은",
-    date: "2026-03-15",
-    time: "15:00",
+    id: 12,
+    clientName: "조서연",
+    date: "2026-04-07",
+    time: "09:00",
     type: "경매 상담",
-    status: "completed",
+    status: "confirmed",
     price: 130000,
   },
   {
-    id: 5,
-    clientName: "정하늘",
-    date: "2026-03-16",
-    time: "09:00",
+    id: 13,
+    clientName: "김태윤",
+    date: "2026-04-11",
+    time: "16:00",
+    type: "절세 상담",
+    status: "pending",
+    price: 150000,
+  },
+  {
+    id: 14,
+    clientName: "이수빈",
+    date: "2026-04-18",
+    time: "10:00",
     type: "분양권 상담",
-    status: "cancelled",
+    status: "confirmed",
     price: 120000,
+  },
+  {
+    id: 15,
+    clientName: "박지훈",
+    date: "2026-04-25",
+    time: "14:00",
+    type: "GTX 역세권 상담",
+    status: "pending",
+    price: 140000,
   },
 ];
 
@@ -402,16 +509,6 @@ export const mockAIRecords: AIConsultationRecord[] = [
   },
   {
     id: 2,
-    clientName: "최지은",
-    date: "2026-03-08",
-    summary:
-      "서울 외곽 경매 물건 3건에 대한 입찰가 분석 요청. 권리분석 결과 1건은 리스크가 높아 제외 권고함.",
-    sentiment: "neutral",
-    keyTopics: ["경매", "권리분석", "입찰가", "리스크"],
-    followUpNeeded: false,
-  },
-  {
-    id: 3,
     clientName: "이영희",
     date: "2026-03-05",
     summary:
@@ -421,13 +518,262 @@ export const mockAIRecords: AIConsultationRecord[] = [
     followUpNeeded: true,
   },
   {
+    id: 3,
+    clientName: "박민수",
+    date: "2026-02-28",
+    summary:
+      "종합부동산세 절세 방안 상담. 1세대 1주택 비과세 요건과 장기보유특별공제 적용 가능성을 분석함.",
+    sentiment: "positive",
+    keyTopics: ["절세", "종부세", "비과세", "장기보유공제"],
+    followUpNeeded: false,
+  },
+  {
     id: 4,
+    clientName: "최지은",
+    date: "2026-02-20",
+    summary:
+      "서울 외곽 경매 물건 3건에 대한 입찰가 분석 요청. 권리분석 결과 1건은 리스크가 높아 제외 권고함.",
+    sentiment: "neutral",
+    keyTopics: ["경매", "권리분석", "입찰가", "리스크"],
+    followUpNeeded: false,
+  },
+  {
+    id: 5,
     clientName: "정하늘",
-    date: "2026-03-01",
+    date: "2026-02-15",
     summary:
       "분양권 전매 관련 세금 문제로 상담. 전매 제한 기간과 양도세 중과 여부를 확인하고 대안을 제시함.",
     sentiment: "negative",
     keyTopics: ["분양권", "전매", "양도세", "중과"],
     followUpNeeded: true,
   },
+  {
+    id: 6,
+    clientName: "한소희",
+    date: "2026-02-10",
+    summary:
+      "GTX-A 노선 개통에 따른 역세권 아파트 가격 변동 전망 상담. 파주·동탄 지역 비교 분석을 진행함.",
+    sentiment: "positive",
+    keyTopics: ["GTX", "역세권", "파주", "동탄"],
+    followUpNeeded: true,
+  },
+  {
+    id: 7,
+    clientName: "오민재",
+    date: "2026-01-28",
+    summary:
+      "전세 만기 후 월세 전환 시 수익률 비교 상담. 현재 전세가율과 월세 시세를 기반으로 최적 전환 비율을 산출함.",
+    sentiment: "neutral",
+    keyTopics: ["전세", "월세", "전환", "수익률"],
+    followUpNeeded: false,
+  },
+  {
+    id: 8,
+    clientName: "윤채원",
+    date: "2026-01-22",
+    summary:
+      "갭투자 리스크 분석 요청. 전세가율 하락 추세에서의 역전세 위험과 대출 규제 영향을 설명함.",
+    sentiment: "negative",
+    keyTopics: ["갭투자", "역전세", "전세가율", "대출규제"],
+    followUpNeeded: true,
+  },
+  {
+    id: 9,
+    clientName: "강예린",
+    date: "2026-01-15",
+    summary:
+      "노후 아파트 리모델링 투자 가치 분석. 리모델링 조합 설립 현황과 예상 분담금을 검토함.",
+    sentiment: "neutral",
+    keyTopics: ["리모델링", "분담금", "조합", "노후아파트"],
+    followUpNeeded: false,
+  },
+  {
+    id: 10,
+    clientName: "임도현",
+    date: "2026-01-10",
+    summary:
+      "다주택자 양도세 중과 유예 기간 활용 전략 상담. 매도 순서와 시기별 세금 시뮬레이션을 제공함.",
+    sentiment: "negative",
+    keyTopics: ["양도세", "중과", "다주택", "매도전략"],
+    followUpNeeded: true,
+  },
+  {
+    id: 11,
+    clientName: "송지호",
+    date: "2026-03-12",
+    summary:
+      "수도권 신축 아파트 분양 일정 및 청약 가점 분석. 특별공급 자격 요건을 확인하고 전략을 수립함.",
+    sentiment: "neutral",
+    keyTopics: ["청약", "특별공급", "가점", "신축"],
+    followUpNeeded: false,
+  },
+  {
+    id: 12,
+    clientName: "조서연",
+    date: "2026-03-14",
+    summary:
+      "상가 투자 수익률 분석 상담. 공실 리스크와 임대차 계약 조건을 검토하고 대안 물건을 추천함.",
+    sentiment: "negative",
+    keyTopics: ["상가", "수익률", "공실", "임대차"],
+    followUpNeeded: true,
+  },
 ];
+
+export const mockAIConsultationDetails: Record<number, AIConsultationDetailRecord> = {
+  1: {
+    id: 1,
+    clientName: "김철수",
+    date: "2026-03-10",
+    duration: "45분",
+    summary:
+      "강남구 재건축 아파트 투자 시점과 예상 수익률에 대해 심층 상담을 진행했습니다. 고객은 2~3년 내 매도를 계획하고 있으며, 양도세 절감 방안과 함께 최적 매도 시점을 분석했습니다.",
+    keyPoints: [
+      "강남구 주요 재건축 단지 사업 진행 현황 분석",
+      "예상 분담금 대비 시세 차익 시뮬레이션",
+      "2~3년 내 매도 시 양도세 예상 금액 산출",
+      "재건축 초과이익환수제 적용 여부 확인",
+    ],
+    recommendations: [
+      "조합원 입주권 확보 후 준공 전 매도 검토",
+      "장기보유특별공제 적용을 위한 보유 기간 전략 수립",
+      "세무사 연계 상담을 통한 절세 플랜 확정",
+    ],
+    actionItems: [
+      "해당 단지 관리처분인가 일정 확인",
+      "양도세 시뮬레이션 보고서 발송",
+      "2주 내 후속 상담 일정 잡기",
+      "세무사 소개 및 연계 진행",
+    ],
+    marketAnalysis:
+      "강남구 재건축 시장은 안전마진 확보 구간에 진입했으며, 2026년 하반기 관리처분인가 예정 단지들의 가격 상승이 예상됩니다.",
+    riskFactors: [
+      "재건축 초과이익환수제 부담금 증가 가능성",
+      "금리 인상에 따른 분담금 부담 확대",
+      "사업 지연 리스크",
+    ],
+    sentiment: "positive",
+    keyTopics: ["재건축", "강남구", "수익률", "양도세"],
+  },
+  2: {
+    id: 2,
+    clientName: "이영희",
+    date: "2026-03-05",
+    duration: "35분",
+    summary:
+      "3기 신도시 청약 전략에 대해 상담했습니다. 가점이 낮아 추첨제 위주로 접근하기로 결정했으며, 사전청약 일정과 자격 요건을 상세히 검토했습니다.",
+    keyPoints: [
+      "현재 청약 가점 42점으로 가점제 당첨 어려움",
+      "추첨제 85㎡ 초과 물량 집중 공략 전략",
+      "사전청약 vs 본청약 장단점 비교",
+    ],
+    recommendations: [
+      "85㎡ 초과 추첨제 물량 위주로 청약 전략 수립",
+      "청약통장 납입 인정 횟수 최대화를 위한 추가 납입",
+      "특별공급 자격 요건 재확인",
+    ],
+    actionItems: [
+      "3기 신도시 사전청약 일정표 발송",
+      "청약 가점 상세 계산서 작성",
+      "추첨제 당첨 확률 시뮬레이션 제공",
+    ],
+    sentiment: "positive",
+    keyTopics: ["청약", "3기 신도시", "추첨제", "사전청약"],
+  },
+  4: {
+    id: 4,
+    clientName: "최지은",
+    date: "2026-02-20",
+    duration: "50분",
+    summary:
+      "서울 외곽 경매 물건 3건에 대한 입찰가 분석을 진행했습니다. 권리분석 결과 1건은 선순위 임차인 리스크가 높아 제외를 권고했으며, 나머지 2건의 적정 입찰가를 산출했습니다.",
+    keyPoints: [
+      "물건 A: 감정가 대비 70% 수준 입찰 권고",
+      "물건 B: 감정가 대비 75% 수준 입찰 권고",
+      "물건 C: 선순위 임차인 보증금 미반환 리스크로 제외",
+      "명도 소요 기간 및 비용 예상치 산출",
+    ],
+    recommendations: [
+      "물건 A를 1순위로 입찰 진행",
+      "낙찰 후 명도 전문 법무사 연계",
+      "대출 사전 승인 확보 후 입찰 참여",
+    ],
+    actionItems: [
+      "물건 A, B 현장 답사 일정 조율",
+      "권리분석 보고서 최종본 발송",
+      "경매 입찰 대리인 위임장 준비",
+      "대출 가능 금액 사전 조회",
+    ],
+    marketAnalysis:
+      "서울 외곽 경매 시장은 낙찰가율이 하락 추세이며, 실수요 목적의 입찰 시 적정 가격에 낙찰받을 기회가 증가하고 있습니다.",
+    riskFactors: [
+      "선순위 임차인 명도 지연 가능성",
+      "건물 하자 및 수리 비용 발생",
+      "경매 취소 또는 변경 가능성",
+    ],
+    sentiment: "neutral",
+    keyTopics: ["경매", "권리분석", "입찰가", "리스크"],
+  },
+  6: {
+    id: 6,
+    clientName: "한소희",
+    date: "2026-02-10",
+    duration: "40분",
+    summary:
+      "GTX-A 노선 개통에 따른 역세권 아파트 가격 변동 전망을 상담했습니다. 파주와 동탄 지역을 비교 분석하고, 투자 적정 시점을 검토했습니다.",
+    keyPoints: [
+      "GTX-A 개통 후 파주 운정 지역 접근성 대폭 개선",
+      "동탄역 인근 아파트 이미 프리미엄 반영 완료",
+      "파주 지역 상대적 저평가 구간 존재",
+    ],
+    recommendations: [
+      "파주 운정 역세권 500m 이내 단지 집중 검토",
+      "개통 전 매수 후 개통 후 1~2년 보유 전략",
+      "동탄은 실거주 목적이 아니면 신규 진입 보류",
+    ],
+    actionItems: [
+      "파주 운정 역세권 단지 리스트 정리",
+      "GTX-A 개통 일정 및 노선도 자료 발송",
+      "파주 vs 동탄 가격 추이 비교 보고서 작성",
+    ],
+    marketAnalysis:
+      "GTX 개통은 수도권 외곽 지역의 교통 혁신으로, 역세권 500m 이내 단지의 가격 상승이 기대됩니다. 특히 파주 운정은 아직 프리미엄이 충분히 반영되지 않은 상태입니다.",
+    riskFactors: [
+      "GTX 개통 지연 가능성",
+      "파주 지역 공급 과잉 우려",
+    ],
+    sentiment: "positive",
+    keyTopics: ["GTX", "역세권", "파주", "동탄"],
+  },
+  8: {
+    id: 8,
+    clientName: "윤채원",
+    date: "2026-01-22",
+    duration: "55분",
+    summary:
+      "갭투자 리스크에 대한 심층 분석을 진행했습니다. 전세가율 하락 추세에서의 역전세 위험과 대출 규제 강화에 따른 영향을 상세히 설명하고, 리스크 완화 방안을 제시했습니다.",
+    keyPoints: [
+      "현재 전세가율 60% 이하로 하락한 지역 다수",
+      "역전세 발생 시 보증금 반환 자금 확보 필요",
+      "DSR 규제로 추가 대출 한도 제한",
+      "전세보증보험 가입 요건 강화 영향",
+    ],
+    recommendations: [
+      "전세가율 70% 이상 유지 지역으로 투자 대상 한정",
+      "역전세 대비 비상 자금 최소 3천만원 확보",
+      "갭투자 대신 월세 수익형 전환 검토",
+    ],
+    actionItems: [
+      "보유 물건 전세가율 현황 점검 보고서 작성",
+      "역전세 시나리오별 자금 계획 수립",
+      "월세 전환 시 수익률 시뮬레이션 제공",
+      "1개월 내 후속 상담으로 진행 상황 점검",
+    ],
+    riskFactors: [
+      "전세가율 추가 하락 시 역전세 확대",
+      "금리 인상에 따른 이자 부담 증가",
+      "전세사기 관련 규제 강화로 임대 시장 위축",
+    ],
+    sentiment: "negative",
+    keyTopics: ["갭투자", "역전세", "전세가율", "대출규제"],
+  },
+};

@@ -20,6 +20,9 @@ import {
   type Notification,
 } from "@/data/notifications";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { mockNotifications as mockConsultationNotifs, type ConsultationNotificationItem } from "@/data/creator-studio";
+import { Calendar as CalendarIcon, XCircle, Star } from "lucide-react";
 
 interface NotificationModalProps {
   onViewAll?: () => void;
@@ -59,6 +62,13 @@ export default function NotificationModal({ onViewAll }: NotificationModalProps)
   };
 
   const recentNotifications = notifications.slice(0, 5);
+
+  const consultTypeIcons: Record<ConsultationNotificationItem["type"], { icon: typeof Bell; className: string }> = {
+    new_booking: { icon: CalendarIcon, className: "text-blue-500" },
+    cancellation: { icon: XCircle, className: "text-red-500" },
+    reminder: { icon: Bell, className: "text-amber-500" },
+    review: { icon: Star, className: "text-purple-500" },
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -100,78 +110,110 @@ export default function NotificationModal({ onViewAll }: NotificationModalProps)
           </Button>
         </div>
 
-        <ScrollArea className="h-[400px]">
-          {recentNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                <Bell className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <p className="font-medium text-foreground mb-1">알림이 없어요</p>
-              <p className="text-sm text-muted-foreground">
-                새로운 소식이 있으면 알려드릴게요
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {recentNotifications.map((notification) => (
-                <button
-                  key={notification.id}
-                  onClick={() => handleNotificationClick(notification)}
-                  className={cn(
-                    "w-full px-4 py-3 flex gap-3 text-left transition-colors hover:bg-muted/50",
-                    !notification.isRead && "bg-primary/5"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-lg",
-                      NOTIFICATION_COLORS[notification.type]
-                    )}
-                  >
-                    {notification.imageUrl ? (
-                      <img
-                        src={notification.imageUrl}
-                        alt=""
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    ) : (
-                      NOTIFICATION_ICONS[notification.type]
-                    )}
+        <Tabs defaultValue="notifications" className="flex-1 flex flex-col">
+          <div className="px-4 pt-2">
+            <TabsList className="w-full grid grid-cols-2">
+              <TabsTrigger value="notifications" data-testid="notif-tab-alerts">알림</TabsTrigger>
+              <TabsTrigger value="consultation" data-testid="notif-tab-consultation">상담</TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="notifications" className="flex-1 m-0">
+            <ScrollArea className="h-[360px]">
+              {recentNotifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <Bell className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p
+                  <p className="font-medium text-foreground mb-1">알림이 없어요</p>
+                  <p className="text-sm text-muted-foreground">
+                    새로운 소식이 있으면 알려드릴게요
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {recentNotifications.map((notification) => (
+                    <button
+                      key={notification.id}
+                      onClick={() => handleNotificationClick(notification)}
+                      className={cn(
+                        "w-full px-4 py-3 flex gap-3 text-left transition-colors hover:bg-muted/50",
+                        !notification.isRead && "bg-primary/5"
+                      )}
+                    >
+                      <div
                         className={cn(
-                          "text-sm line-clamp-1",
-                          !notification.isRead && "font-semibold"
+                          "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-lg",
+                          NOTIFICATION_COLORS[notification.type]
                         )}
                       >
-                        {notification.title}
-                      </p>
-                      {!notification.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-[#126BFF] shrink-0 mt-1.5" />
-                      )}
+                        {notification.imageUrl ? (
+                          <img
+                            src={notification.imageUrl}
+                            alt=""
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          NOTIFICATION_ICONS[notification.type]
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <p
+                            className={cn(
+                              "text-sm line-clamp-1",
+                              !notification.isRead && "font-semibold"
+                            )}
+                          >
+                            {notification.title}
+                          </p>
+                          {!notification.isRead && (
+                            <span className="w-2 h-2 rounded-full bg-[#126BFF] shrink-0 mt-1.5" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                          {notification.description}
+                        </p>
+                        <div className="flex items-center justify-between mt-1.5">
+                          <span className="text-[11px] text-muted-foreground">
+                            {formatNotificationTime(notification.timestamp)}
+                          </span>
+                          {notification.actionLabel && (
+                            <span className="text-[11px] text-[#126BFF] font-medium flex items-center gap-0.5">
+                              {notification.actionLabel}
+                              <ChevronRight className="w-3 h-3" />
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </TabsContent>
+          <TabsContent value="consultation" className="flex-1 m-0">
+            <ScrollArea className="h-[360px]">
+              <div className="divide-y">
+                {mockConsultationNotifs.map((notif) => {
+                  const config = consultTypeIcons[notif.type];
+                  const Icon = config.icon;
+                  return (
+                    <div key={notif.id} className={cn("px-4 py-3 flex gap-3", !notif.isRead && "bg-primary/5")}>
+                      <div className="shrink-0 mt-0.5">
+                        <Icon className={`w-5 h-5 ${config.className}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={cn("text-sm", !notif.isRead && "font-semibold")}>{notif.message}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{notif.createdAt.replace("T", " ").slice(0, 16)}</p>
+                      </div>
+                      {!notif.isRead && <span className="w-2 h-2 rounded-full bg-[#126BFF] shrink-0 mt-1.5" />}
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                      {notification.description}
-                    </p>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <span className="text-[11px] text-muted-foreground">
-                        {formatNotificationTime(notification.timestamp)}
-                      </span>
-                      {notification.actionLabel && (
-                        <span className="text-[11px] text-[#126BFF] font-medium flex items-center gap-0.5">
-                          {notification.actionLabel}
-                          <ChevronRight className="w-3 h-3" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
 
         {notifications.length > 5 && (
           <>

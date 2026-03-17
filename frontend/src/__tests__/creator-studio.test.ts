@@ -11,6 +11,7 @@ import {
   mockWeeklySchedule,
   mockTodaySessions,
   mockAIRecords,
+  mockAIConsultationDetails,
 } from "../data/creator-studio";
 
 // ─── Array Non-Empty ──────────────────────────────────────────
@@ -28,8 +29,8 @@ describe("mock data arrays are non-empty", () => {
     expect(mockCourseProgress.length).toBeGreaterThan(0);
   });
 
-  test("mockConsultationBookings is non-empty", () => {
-    expect(mockConsultationBookings.length).toBeGreaterThan(0);
+  test("mockConsultationBookings has at least 10 entries", () => {
+    expect(mockConsultationBookings.length).toBeGreaterThanOrEqual(10);
   });
 
   test("mockNotifications is non-empty", () => {
@@ -44,26 +45,73 @@ describe("mock data arrays are non-empty", () => {
     expect(mockTodaySessions.length).toBeGreaterThan(0);
   });
 
-  test("mockAIRecords is non-empty", () => {
-    expect(mockAIRecords.length).toBeGreaterThan(0);
+  test("mockAIRecords has at least 12 entries", () => {
+    expect(mockAIRecords.length).toBeGreaterThanOrEqual(12);
   });
 });
 
 // ─── SECTION_KEYS ─────────────────────────────────────────────
 
 describe("SECTION_KEYS", () => {
-  test("has exactly 7 items", () => {
-    expect(SECTION_KEYS.length).toBe(7);
+  test("has exactly 6 items", () => {
+    expect(SECTION_KEYS.length).toBe(6);
   });
 
   test("contains expected keys", () => {
     expect(SECTION_KEYS).toContain("course-sales");
     expect(SECTION_KEYS).toContain("course-management");
     expect(SECTION_KEYS).toContain("consultation-scheduler");
-    expect(SECTION_KEYS).toContain("consultation-notifications");
     expect(SECTION_KEYS).toContain("available-time-settings");
     expect(SECTION_KEYS).toContain("consultation-room");
     expect(SECTION_KEYS).toContain("ai-consultation-history");
+  });
+});
+
+// ─── Consultation Bookings Across Months ──────────────────────
+
+describe("mockConsultationBookings date coverage", () => {
+  test("has bookings in February 2026", () => {
+    const febBookings = mockConsultationBookings.filter((b) =>
+      b.date.startsWith("2026-02")
+    );
+    expect(febBookings.length).toBeGreaterThan(0);
+  });
+
+  test("has bookings in March 2026", () => {
+    const marBookings = mockConsultationBookings.filter((b) =>
+      b.date.startsWith("2026-03")
+    );
+    expect(marBookings.length).toBeGreaterThan(0);
+  });
+
+  test("has bookings in April 2026", () => {
+    const aprBookings = mockConsultationBookings.filter((b) =>
+      b.date.startsWith("2026-04")
+    );
+    expect(aprBookings.length).toBeGreaterThan(0);
+  });
+});
+
+// ─── AI Consultation Details ──────────────────────────────────
+
+describe("mockAIConsultationDetails", () => {
+  test("is non-empty", () => {
+    expect(Object.keys(mockAIConsultationDetails).length).toBeGreaterThan(0);
+  });
+
+  test("each detail has valid required fields", () => {
+    const koreanRegex = /[\uAC00-\uD7AF]/;
+    for (const detail of Object.values(mockAIConsultationDetails)) {
+      expect(detail.id).toBeGreaterThan(0);
+      expect(koreanRegex.test(detail.clientName)).toBe(true);
+      expect(detail.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(koreanRegex.test(detail.summary)).toBe(true);
+      expect(detail.keyPoints.length).toBeGreaterThan(0);
+      expect(detail.recommendations.length).toBeGreaterThan(0);
+      expect(detail.actionItems.length).toBeGreaterThan(0);
+      expect(["positive", "neutral", "negative"]).toContain(detail.sentiment);
+      expect(detail.keyTopics.length).toBeGreaterThan(0);
+    }
   });
 });
 

@@ -32,7 +32,6 @@ const courseItems: { key: SectionKey; label: string }[] = [
 
 const consultationItems: { key: SectionKey; label: string }[] = [
   { key: "consultation-scheduler", label: "상담 예약 스케줄러" },
-  { key: "consultation-notifications", label: "알림" },
   { key: "available-time-settings", label: "예약 가능 시간 설정" },
   { key: "consultation-room", label: "상담 전용 화면" },
   { key: "ai-consultation-history", label: "AI 상담 이력 관리" },
