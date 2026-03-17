@@ -8,9 +8,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import CreatorStudioSidebar from "./creator-studio/CreatorStudioSidebar";
-import CourseCreate from "./creator-studio/CourseCreate";
 import CourseSales from "./creator-studio/CourseSales";
-import CourseProgress from "./creator-studio/CourseProgress";
 import CourseManagement from "./creator-studio/CourseManagement";
 import ConsultationScheduler from "./creator-studio/ConsultationScheduler";
 import ConsultationNotifications from "./creator-studio/ConsultationNotifications";
@@ -20,9 +18,7 @@ import AIConsultationHistory from "./creator-studio/AIConsultationHistory";
 import type { SectionKey } from "@/data/creator-studio";
 
 const sectionTitles: Record<SectionKey, string> = {
-  "course-create": "강의 개설",
   "course-sales": "강의 판매",
-  "course-progress": "강의 진행",
   "course-management": "강의 관리",
   "consultation-scheduler": "상담 예약 스케줄러",
   "consultation-notifications": "알림",
@@ -33,12 +29,8 @@ const sectionTitles: Record<SectionKey, string> = {
 
 function renderContent(activeSection: SectionKey) {
   switch (activeSection) {
-    case "course-create":
-      return <CourseCreate />;
     case "course-sales":
       return <CourseSales />;
-    case "course-progress":
-      return <CourseProgress />;
     case "course-management":
       return <CourseManagement />;
     case "consultation-scheduler":

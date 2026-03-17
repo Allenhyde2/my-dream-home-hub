@@ -26,10 +26,8 @@ interface CreatorStudioSidebarProps {
 }
 
 const courseItems: { key: SectionKey; label: string }[] = [
-  { key: "course-create", label: "강의 개설" },
-  { key: "course-sales", label: "강의 판매" },
-  { key: "course-progress", label: "강의 진행" },
   { key: "course-management", label: "강의 관리" },
+  { key: "course-sales", label: "강의 판매" },
 ];
 
 const consultationItems: { key: SectionKey; label: string }[] = [

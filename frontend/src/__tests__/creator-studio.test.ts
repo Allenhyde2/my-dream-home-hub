@@ -4,6 +4,8 @@ import {
   mockCreatorCourses,
   mockCourseSales,
   mockCourseProgress,
+  mockChapterProgress,
+  mockStudentActivity,
   mockConsultationBookings,
   mockNotifications,
   mockWeeklySchedule,
@@ -50,14 +52,12 @@ describe("mock data arrays are non-empty", () => {
 // ─── SECTION_KEYS ─────────────────────────────────────────────
 
 describe("SECTION_KEYS", () => {
-  test("has exactly 9 items", () => {
-    expect(SECTION_KEYS.length).toBe(9);
+  test("has exactly 7 items", () => {
+    expect(SECTION_KEYS.length).toBe(7);
   });
 
   test("contains expected keys", () => {
-    expect(SECTION_KEYS).toContain("course-create");
     expect(SECTION_KEYS).toContain("course-sales");
-    expect(SECTION_KEYS).toContain("course-progress");
     expect(SECTION_KEYS).toContain("course-management");
     expect(SECTION_KEYS).toContain("consultation-scheduler");
     expect(SECTION_KEYS).toContain("consultation-notifications");
@@ -171,6 +171,65 @@ describe("Korean text exists in title/name fields", () => {
   test("today session product names contain Korean", () => {
     for (const session of mockTodaySessions) {
       expect(koreanRegex.test(session.productName)).toBe(true);
+    }
+  });
+});
+
+// ─── Chapter Progress & Student Activity ──────────────────────
+
+describe("mockChapterProgress", () => {
+  test("has data for courses with students (1, 2, 5)", () => {
+    expect(mockChapterProgress[1]).toBeDefined();
+    expect(mockChapterProgress[2]).toBeDefined();
+    expect(mockChapterProgress[5]).toBeDefined();
+  });
+
+  test("does not have data for draft courses (3, 4)", () => {
+    expect(mockChapterProgress[3]).toBeUndefined();
+    expect(mockChapterProgress[4]).toBeUndefined();
+  });
+
+  test("each course has chapters with valid data", () => {
+    const koreanRegex = /[\uAC00-\uD7AF]/;
+    for (const courseId of [1, 2, 5]) {
+      const chapters = mockChapterProgress[courseId];
+      expect(chapters.length).toBeGreaterThanOrEqual(4);
+      for (const chapter of chapters) {
+        expect(chapter.chapterId).toBeGreaterThan(0);
+        expect(koreanRegex.test(chapter.chapterTitle)).toBe(true);
+        expect(chapter.completionRate).toBeGreaterThanOrEqual(0);
+        expect(chapter.completionRate).toBeLessThanOrEqual(100);
+        expect(chapter.totalLessons).toBeGreaterThan(0);
+        expect(chapter.completedLessons).toBeLessThanOrEqual(chapter.totalLessons);
+      }
+    }
+  });
+});
+
+describe("mockStudentActivity", () => {
+  test("has data for courses with students (1, 2, 5)", () => {
+    expect(mockStudentActivity[1]).toBeDefined();
+    expect(mockStudentActivity[2]).toBeDefined();
+    expect(mockStudentActivity[5]).toBeDefined();
+  });
+
+  test("does not have data for draft courses (3, 4)", () => {
+    expect(mockStudentActivity[3]).toBeUndefined();
+    expect(mockStudentActivity[4]).toBeUndefined();
+  });
+
+  test("each course has students with valid data", () => {
+    const koreanRegex = /[\uAC00-\uD7AF]/;
+    for (const courseId of [1, 2, 5]) {
+      const students = mockStudentActivity[courseId];
+      expect(students.length).toBeGreaterThanOrEqual(3);
+      for (const student of students) {
+        expect(student.id).toBeGreaterThan(0);
+        expect(koreanRegex.test(student.studentName)).toBe(true);
+        expect(student.progress).toBeGreaterThanOrEqual(0);
+        expect(student.progress).toBeLessThanOrEqual(100);
+        expect(student.completedLessons).toBeLessThanOrEqual(student.totalLessons);
+      }
     }
   });
 });

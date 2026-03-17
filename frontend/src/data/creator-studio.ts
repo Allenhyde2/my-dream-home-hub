@@ -31,6 +31,23 @@ export interface CourseProgressRecord {
   activeStudents: number;
 }
 
+export interface CourseChapterProgress {
+  chapterId: number;
+  chapterTitle: string;
+  completionRate: number;
+  totalLessons: number;
+  completedLessons: number;
+}
+
+export interface StudentActivityRecord {
+  id: number;
+  studentName: string;
+  lastActive: string;
+  progress: number;
+  completedLessons: number;
+  totalLessons: number;
+}
+
 export interface ConsultationBookingRecord {
   id: number;
   clientName: string;
@@ -78,9 +95,7 @@ export interface AIConsultationRecord {
 // ─── Section Keys ─────────────────────────────────────────────
 
 export const SECTION_KEYS = [
-  "course-create",
   "course-sales",
-  "course-progress",
   "course-management",
   "consultation-scheduler",
   "consultation-notifications",
@@ -209,6 +224,47 @@ export const mockCourseProgress: CourseProgressRecord[] = [
     activeStudents: 12,
   },
 ];
+
+export const mockChapterProgress: Record<number, CourseChapterProgress[]> = {
+  1: [
+    { chapterId: 1, chapterTitle: "재건축의 기본 개념", completionRate: 92.1, totalLessons: 5, completedLessons: 5 },
+    { chapterId: 2, chapterTitle: "재건축 사업 절차 이해", completionRate: 84.5, totalLessons: 6, completedLessons: 5 },
+    { chapterId: 3, chapterTitle: "조합원 자격과 분담금", completionRate: 71.3, totalLessons: 4, completedLessons: 3 },
+    { chapterId: 4, chapterTitle: "재건축 투자 수익 분석", completionRate: 58.2, totalLessons: 5, completedLessons: 3 },
+    { chapterId: 5, chapterTitle: "실전 재건축 사례 연구", completionRate: 42.7, totalLessons: 4, completedLessons: 2 },
+  ],
+  2: [
+    { chapterId: 1, chapterTitle: "청약 제도 기초", completionRate: 88.4, totalLessons: 4, completedLessons: 4 },
+    { chapterId: 2, chapterTitle: "가점제와 추첨제 전략", completionRate: 72.6, totalLessons: 5, completedLessons: 4 },
+    { chapterId: 3, chapterTitle: "특별공급 완전 분석", completionRate: 55.8, totalLessons: 4, completedLessons: 2 },
+    { chapterId: 4, chapterTitle: "당첨 확률 높이는 실전 팁", completionRate: 38.1, totalLessons: 5, completedLessons: 2 },
+  ],
+  5: [
+    { chapterId: 1, chapterTitle: "신도시 개발 계획 읽기", completionRate: 95.3, totalLessons: 4, completedLessons: 4 },
+    { chapterId: 2, chapterTitle: "분양권 가치 평가 방법", completionRate: 89.1, totalLessons: 5, completedLessons: 4 },
+    { chapterId: 3, chapterTitle: "프리미엄 분석과 매매 전략", completionRate: 82.0, totalLessons: 4, completedLessons: 3 },
+    { chapterId: 4, chapterTitle: "3기 신도시 투자 포인트", completionRate: 76.6, totalLessons: 5, completedLessons: 4 },
+  ],
+};
+
+export const mockStudentActivity: Record<number, StudentActivityRecord[]> = {
+  1: [
+    { id: 1, studentName: "김서연", lastActive: "2026-03-17", progress: 85.2, completedLessons: 20, totalLessons: 24 },
+    { id: 2, studentName: "박준혁", lastActive: "2026-03-16", progress: 62.5, completedLessons: 15, totalLessons: 24 },
+    { id: 3, studentName: "이하은", lastActive: "2026-03-15", progress: 41.7, completedLessons: 10, totalLessons: 24 },
+    { id: 4, studentName: "정우진", lastActive: "2026-03-14", progress: 29.2, completedLessons: 7, totalLessons: 24 },
+  ],
+  2: [
+    { id: 5, studentName: "한소희", lastActive: "2026-03-17", progress: 77.8, completedLessons: 14, totalLessons: 18 },
+    { id: 6, studentName: "오민재", lastActive: "2026-03-16", progress: 55.6, completedLessons: 10, totalLessons: 18 },
+    { id: 7, studentName: "윤채원", lastActive: "2026-03-13", progress: 33.3, completedLessons: 6, totalLessons: 18 },
+  ],
+  5: [
+    { id: 8, studentName: "송지호", lastActive: "2026-03-10", progress: 94.4, completedLessons: 17, totalLessons: 18 },
+    { id: 9, studentName: "강예린", lastActive: "2026-03-08", progress: 88.9, completedLessons: 16, totalLessons: 18 },
+    { id: 10, studentName: "임도현", lastActive: "2026-03-05", progress: 72.2, completedLessons: 13, totalLessons: 18 },
+  ],
+};
 
 export const mockConsultationBookings: ConsultationBookingRecord[] = [
   {
