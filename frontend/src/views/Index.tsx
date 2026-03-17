@@ -17,7 +17,7 @@ import NotificationModal from "@/components/NotificationModal";
 
 
 
-import { Home, Bell, User, Search, LogOut, LogIn, BookOpen, Calendar, BellRing } from "lucide-react";
+import { Home, Bell, User, Search, LogOut, LogIn, BookOpen, Calendar, BellRing, Shield, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -162,6 +162,15 @@ const Index = () => {
                     <DropdownMenuItem onClick={() => navigate("/my-courses")} className="cursor-pointer" data-testid="link-my-learning">
                       <BookOpen className="w-4 h-4 mr-2" />
                       <span>내 강의</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer" data-testid="link-admin">
+                      <Shield className="w-4 h-4 mr-2" />
+                      <span>관리자</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/creator-studio")} className="cursor-pointer" data-testid="link-creator-studio">
+                      <Palette className="w-4 h-4 mr-2" />
+                      <span>크리에이터 도구</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
